@@ -1,9 +1,21 @@
-var gameField = null;
+let gameField = null;
+let two = null;
 
 
 function main() {
     monke();
     setupGamefield();
+    eventInitialisator();
+}
+
+function eventInitialisator()
+{
+    $(window).on('resize', () => {
+        var scale = gameField.width() / two.width;
+        two.scene.scale = scale;
+        two.renderer.setSize(gameField.width(), gameField.height())
+        two.renderer.trigger( Two.Events.resize, gameField.width(), gameField.height());
+    })
 }
 
 $(function() {
@@ -16,20 +28,20 @@ function setupGamefield() {
 
 
     // Make an instance of two and place it on the page.
-    var elem = document.getElementById('gamefield');
-    var params = { width: gameField.width(), height: gameField.height() };
-    var two = new Two(params).appendTo(elem);
+    let elem = document.getElementById('gamefield');
+    let params = { width: gameField.width(), height: gameField.height() };
+    two = new Two(params).appendTo(elem);
  
-    var circle = two.makeCircle(-70, 0, 50);
-    var rect = two.makeRectangle(70, 0, 100, 100);
+    let circle = two.makeCircle(-70, 0, 50);
+    let rect = two.makeRectangle(70, 0, 100, 100);
     circle.fill = '#FF8000';
     rect.fill = 'rgba(0, 200, 255, 0.75)';
 
-    var rrectA = two.makeRoundedRectangle(400, 100, 200, 100, 10);
+    let rrectA = two.makeRoundedRectangle(400, 100, 200, 100, 10);
     rrectA.stroke = 'blue';
     rrectA.lineWidth = 45;
     
-    var group = two.makeGroup(circle, rect);
+    let group = two.makeGroup(circle, rect);
     group.translation.set(two.width / 2, two.height / 2);
     group.scale = 0;
     group.noStroke();
@@ -40,7 +52,7 @@ function setupGamefield() {
         if (group.scale > 0.9999) {
           group.scale = group.rotation = 0;
         }
-        var t = (1 - group.scale) * 0.125;
+        let t = (1 - group.scale) * 0.125;
         group.scale += t;
         group.rotation += t * 4 * Math.PI;
       }).play();  // Finally, start the animation loop
