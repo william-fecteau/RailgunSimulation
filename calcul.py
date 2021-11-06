@@ -1,5 +1,5 @@
 import math
-
+import numpy
 
 class Vector:
     def __init__(self,x,y):
@@ -14,45 +14,49 @@ class Vector:
         else:
             self.angle = math.atan(y/x)
         
-    def ModifComposante(self,x,y):
+    def SetComponent(self,x,y):
         self.x = x
         self.y = y
         self.hyp = math.sqrt(x**2 + y**2)
         self.angle = math.atan(y/x)
     
-    def ModifPolaire(self, hyp, angle):
+    def SetPolar(self, hyp, angle):
         self.hyp = hyp
         self.angle = angle
         self.x = hyp*math.cos(angle)
         self.y = hyp*math.sin(angle)
     
     def Print(self):
-        print("Composantes: \n X: ", self.x, " \n Y: ", self.y, "\n\n Hypotenuse: ", self.hyp, "\n Angle(rad): ", self.angle )
+        print("Component: \n X: ", self.x, " \n Y: ", self.y, "\n\n Hypothenuse: ", self.hyp, "\n Angle(rad): ", self.angle )
 
 
 
 
 class Projectile:
-    def __init__(self,masse,volume):
-        self.masse = masse
-        self.vitesse = Vector(0,0)
+    def __init__(self,mass,volume):
+        self.mass = mass
+        self.velocity = Vector(0,0)
         self.position = Vector(0,0)
         self.acceleration = Vector(0,0)
         self.volume = volume
 
 
     #prend un Vector 
-    def ModifVitesse(self,vitesse):
-        self.vitesse = vitesse
+    def SetVelocity(self,velocity):
+        self.velocity = velocity
 
-    def ModifPosition(self,position):
+    def SetPosition(self,position):
         self.position = position
     #position
     #masse
     #velocite
     #densite/volume
     
-#class Environement:
+class Environement:
+
+    def __init__(self,gravity,):
+        self.gravity = gravity
+
     #densite air/coeff drag
     #gravite
     #vitesse vent
@@ -61,13 +65,13 @@ class Projectile:
 
 vitesse = Vector(0,-1)
 position = Vector(3,9)
-vitesse.ModifPolaire(1000,1/2)
+vitesse.SetPolar(1000,1/2)
 
 vitesse.Print()
 
 Xavier = Projectile(10,1)
-Xavier.ModifPosition(position)
-Xavier.ModifVitesse(vitesse)
+Xavier.SetPosition(position)
+Xavier.SetVelocity(vitesse)
 
 Xavier.position.Print()
-Xavier.vitesse.Print()
+Xavier.velocity.Print()
