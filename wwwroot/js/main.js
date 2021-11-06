@@ -24,8 +24,7 @@ $(function() {
 ======================================
  */
 function update() {
-    cube.rotation.x += 0.01;
-    cube.rotation.y += 0.01;
+    cube.position.x += 0.01;
 }
 
 
@@ -40,9 +39,10 @@ function gameLoop() {
     }
 
     update();
-    requestAnimationFrame(gameLoop);
-
+    
     renderer.render(scene, camera);
+
+    requestAnimationFrame(gameLoop);
 };
 
 
@@ -50,7 +50,8 @@ function setupGamefield() {
     gameField = $("#gamefield");
 
     scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+    //camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera = new THREE.OrthographicCamera(window.innerWidth/-2, window.innerWidth/2, window.innerHeight/2, window.innerHeight/-2, -1, 1);
 
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -96,12 +97,10 @@ function monke() {
  */
 $("#start-sim").click(function() {
     // Creating dummy cube
-    const geometry = new THREE.BoxGeometry();
+    const geometry = new THREE.PlaneGeometry(100, 100);
     const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
     cube = new THREE.Mesh(geometry, material);
     scene.add(cube);
-
-    camera.position.z = 5;
 
     isSimulationRunning = true;
     gameLoop(); // Start it (Its gonna call itself internally)
@@ -111,4 +110,8 @@ $("#stop-sim").click(function() {
     cleanGameScene();
     gameLoop(); // Make sure its rendering a black scene
     isSimulationRunning = false; // Stop it
+});
+
+$("#test").click(function() {
+    camera.translateX(10);
 });
