@@ -1,0 +1,21 @@
+.sections {
+    display:inline-block;
+    width: 100%;
+    margin: 0px;
+}
+
+.container {
+    display:flex;
+    flex-direction:row;
+    width:100%;
+    height:100%;
+}
+
+#menu {
+    height: 20%;
+    background-color:rgb(63, 71, 48);
+}
+
+#gamefield {
+    background-color: black;
+}
