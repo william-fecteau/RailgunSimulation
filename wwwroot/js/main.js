@@ -34,9 +34,9 @@ function gameLoop() {
     if (!isSimulationRunning) return;
 
     // Scaling camera in case the window size changes
-    if (renderer.width !== innerWidth || renderer.height !== innerHeight) {
-        renderer.setSize(innerWidth, innerHeight);
-        camera.aspect = innerWidth/innerHeight;
+    if (renderer.width !== gameField.width() || renderer.height !== gameField.height()) {
+        renderer.setSize(gameField.width(), gameField.height());
+        camera.aspect = gameField.width()/gameField.height();
         camera.updateProjectionMatrix();
     }
 
@@ -52,10 +52,10 @@ function setupGamefield() {
     gameField = $("#gamefield");
 
     scene = new THREE.Scene();
-    camera = new THREE.OrthographicCamera(0, window.innerWidth, window.innerHeight, 0, -1, 1);
+    camera = new THREE.OrthographicCamera(0, gameField.width(), gameField.height(), 0, -1, 1);
 
     renderer = new THREE.WebGLRenderer();
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setSize(gameField.width(), gameField.height());
     gameField.append(renderer.domElement);
 }
 
