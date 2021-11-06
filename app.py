@@ -1,7 +1,9 @@
-from flask import Flask
+from flask import Flask, send_from_directory
 
-app = Flask(__name__)
+app = Flask(__name__,
+            static_url_path='', 
+            static_folder='wwwroot')
 
 @app.route("/")
 def hello_world():
-    return "<p>Hello, World!</p>"
+    return app.send_static_file('index.html')
