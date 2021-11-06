@@ -47,31 +47,70 @@ class Projectile:
 
     def SetPosition(self,position):
         self.position = position
+
+    def SetAcceleration(self, acceleration):
+        self.acceleration = acceleration
     #position
     #masse
     #velocite
     #densite/volume
-    
-class Environement:
 
-    def __init__(self,gravity,):
-        self.gravity = gravity
 
-    #densite air/coeff drag
-    #gravite
-    #vitesse vent
+
+
     
 
+#fonctions de calcul ---------------------------------------------------------
 
-vitesse = Vector(0,-1)
-position = Vector(3,9)
-vitesse.SetPolar(1000,1/2)
+def rail_gun(voltage, mass, resistance, lenght, interspace):
+    intensity = voltage / resistance
+    field = ((4 * math.pi * 10**-7) * intensity) / (2 * math.pi * (interspace / 2))
+    force = intensity * field * interspace
+    acc = force / mass
+    speed = math.sqrt(2 * acc * lenght)
+    return speed
 
-vitesse.Print()
 
-Xavier = Projectile(10,1)
-Xavier.SetPosition(position)
-Xavier.SetVelocity(vitesse)
 
-Xavier.position.Print()
-Xavier.velocity.Print()
+
+def ArrayOutput(projectile, points, timeStep):
+    output = []
+    for i in range(points):
+        time = i*timeStep
+
+        #calcul de la velocity 
+        Vx = projectile.velocity.x + projectile.acceleration.x *time
+        Vy = projectile.velocity.y + projectile.acceleration.y *time
+
+
+
+        #calcul de la position
+        Py = max(0,projectile.velocity.y *time + (projectile.acceleration.y/2)*(time**2) + projectile.position.y)
+        if(Py == 0): #impact avec le sol, le mouvement s'arrete
+            Px = 0
+            Vx = 0
+            Vy = 0
+        else:
+            Px = projectile.velocity.x *time +projectile.position.x + (projectile.acceleration.y/2)*(time**2)
+        
+        
+        output.append((Px,Py,Vx,Vy))
+    return(output)
+         
+
+
+
+#test code -------------------------------------------
+
+
+
+
+print(rail_gun(120,2,1,500,1))
+
+
+ang = math.pi /18
+projectile = Projectile(10,1)
+projectile.velocity.SetPolar(rail_gun(120,2,1,500,1), ang)
+projectile.position = Vector(0,0)
+projectile.velocity.Print()
+print(ArrayOutput(projectile,10,0.2)) 
