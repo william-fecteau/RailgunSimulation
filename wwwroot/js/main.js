@@ -2,16 +2,21 @@ const METER_FACTOR = 50;
 
 let gameField = null; // Element containing the renderer
 let isSimulationRunning = false; // This lets us control if the game loop is gonna call itself
+let curSimData = null; // Simulation data calculated by the backend
+let curStep = 0; // Current simulation step reached relative to the fixed time stamp
+let frameCounter = 0;
+
 
 // Three.js objects
 let scene = null; 
 let camera = null; 
 let renderer = null; 
+let projectile = null;  // Projectile object
 
-// Dummy cube
-let cube = null; 
+
 
 function main() {
+    gameField = $("#gamefield");
     setupGamefield();
 }
 
@@ -25,10 +30,41 @@ $(function() {
             THREE.JS STUFF
 ======================================
  */
-function update() {
-    cube.position.x += .05 * METER_FACTOR;
+function setupGamefield() {
+    scene = new THREE.Scene();
+    camera = new THREE.OrthographicCamera(0, gameField.width(), gameField.height(), 0, -1, 1);
+
+    renderer = new THREE.WebGLRenderer();
+    renderer.setSize(gameField.width(), gameField.height());
+    gameField.append(renderer.domElement);
 }
 
+function startSimulation() {
+    if (isSimulationRunning) return;
+    if (curSimData == null || curSimData.length == 0) return;
+
+    // Creating projectile
+    const geometry = new THREE.PlaneGeometry(1 * METER_FACTOR, 1 * METER_FACTOR);
+    const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+    projectile = new THREE.Mesh(geometry, material);
+    projectile.position.set(1 * METER_FACTOR, 1 * METER_FACTOR, 0);
+    scene.add(projectile);
+    
+    curStep = 0;
+    frameCounter = 0;
+    isSimulationRunning = true;
+    gameLoop(); // Start it (Its gonna call itself internally)
+}
+
+function stopSimulation() {
+    if (!isSimulationRunning) return;
+
+    while(scene.children.length > 0) { 
+        scene.remove(scene.children[0]); 
+    }
+
+    isSimulationRunning = false; // Stop it, get some help
+}
 
 function gameLoop() {
     if (!isSimulationRunning) return;
@@ -47,48 +83,26 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 };
 
+function update() {
+    // Every second, update position
+    if (frameCounter % 60 == 0) {
+        curStep++;
 
-function setupGamefield() {
-    gameField = $("#gamefield");
+        // If no more data, stop the simulation
+        if (curStep >= curSimData.length) {
+            stopSimulation();
+            return;
+        }
 
-    scene = new THREE.Scene();
-    camera = new THREE.OrthographicCamera(0, gameField.width(), gameField.height(), 0, -1, 1);
+        let stepData = curSimData[curStep];
+        let x = stepData[0];
+        let y = stepData[1];
 
-    renderer = new THREE.WebGLRenderer();
-    renderer.setSize(gameField.width(), gameField.height());
-    gameField.append(renderer.domElement);
-}
-
-function cleanGameScene() {
-    while(scene.children.length > 0){ 
-        scene.remove(scene.children[0]); 
+        projectile.position.set(x * METER_FACTOR, y * METER_FACTOR, 0);
     }
+
+    frameCounter++;
 }
-
-
-
-/*
-======================================
-                AJAX
-======================================
- */
-function monke() {
-    $.ajax({
-        type: "POST",
-        url: document.location.href  + "/ajaxRunSimulation",
-        data: JSON.stringify({ "nbPoints": 6 }),
-        contentType: "application/json; charset=utf-8",
-        dataType: "json",
-    }).done(function(e) {
-        console.log(e);
-    }).fail(function(e) {
-        console.log(e);
-    });
-}
-
-
-
-
 
 
 /*
@@ -97,21 +111,32 @@ function monke() {
 ======================================
  */
 $("#start-sim").click(function() {
-    // Creating dummy cube
-    const geometry = new THREE.PlaneGeometry(2 * METER_FACTOR, 2 * METER_FACTOR);
-    const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-    cube = new THREE.Mesh(geometry, material);
-    cube.position.set(0, 2 * METER_FACTOR, 0);
-    scene.add(cube);
+    if (isSimulationRunning) return;
 
-    isSimulationRunning = true;
-    gameLoop(); // Start it (Its gonna call itself internally)
+    // Calculating simulation
+    $.ajax({
+        type: "POST",
+        url: document.location.href  + "/ajaxRunSimulation",
+        data: JSON.stringify({ "nbPoints": 6 }),
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+    }).done(function(e) {
+        curSimData = e["data"];
+        if (curSimData == null || curSimData.length == 0) return; // Add something client side to show that it exploded
+    
+        startSimulation();
+    }).fail(function(e) {
+        console.log(e);
+    });
 });
 
 $("#stop-sim").click(function() {
-    cleanGameScene();
-    gameLoop(); // Make sure its rendering a black scene
-    isSimulationRunning = false; // Stop it
+    stopSimulation();
+
+    // Make one iteration just to get a black screen
+    isSimulationRunning = true;
+    gameLoop();
+    isSimulationRunning = false;
 });
 
 $("#test").click(function() {
