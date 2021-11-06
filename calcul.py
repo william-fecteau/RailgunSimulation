@@ -54,19 +54,7 @@ class Projectile:
     #velocite
     #densite/volume
 
-"""
-cible:
-hauteur
-position xy 
 
-etat: brisee t/f
-
-
-comportement: 
-avant le tir: check si trajectoire passe dans la cible
-pendant le tir quand on arrive au step juste apres le moment de colision
-    set brisee a true 
-"""
 class Cible:
     broken = False
     def __init__(self, x,y,height):
@@ -116,22 +104,65 @@ def ArrayOutput(projectile, points, timeStep):
         Vy = projectile.velocity.y + projectile.acceleration.y *time
 
 
-
+        Px = projectile.velocity.x *time +projectile.position.x + (projectile.acceleration.y/2)*(time**2)
         #calcul de la position
         Py = max(0,projectile.velocity.y *time + (projectile.acceleration.y/2)*(time**2) + projectile.position.y)
         if(Py == 0): #impact avec le sol, le mouvement s'arrete
-            Px = 0
-            Vx = 0
-            Vy = 0
-        else:
-            Px = projectile.velocity.x *time +projectile.position.x + (projectile.acceleration.y/2)*(time**2)
+            output.append((Px,Py,Vx,Vy))
+            return(output)
+
+           
         
         
         output.append((Px,Py,Vx,Vy))
     return(output)
          
+def ArrayOutputFriction(projectile, points, timeStep, friction):
+    output = []
+    compteur =0
+    for i in range(points):
+        time = i*timeStep
+
+        #calcul de la velocity 
+
+        c = projectile.mass * projectile.velocity.x/friction
+        Vx = (c*friction/projectile.mass)*math.exp(-friction*time/projectile.mass)
+
+
+        c = projectile.acceleration.y * projectile.mass/friction
+        Vy = c + (projectile.velocity.y - c)*(math.exp(-friction*time/projectile.mass))
+        
+
+
+
+        #calcul de la position
+        c1 = projectile.acceleration.y*projectile.mass/friction
+        c2 = (projectile.mass/friction)*(projectile.velocity.y - projectile.acceleration.y*projectile.mass/friction)
+        Py = max(0,c1*time + c2*(1-math.exp(-friction*time/projectile.mass)) +projectile.position.y)
+
+
+        c = projectile.mass * projectile.velocity.x/friction
+        Px = c*(1-math.exp(-friction * time / projectile.mass)) +projectile.position.x
+
+        
+        if(Py == 0): #impact avec le sol, le mouvement s'arrete
+            output.append((Px,Py,Vx,Vy))
+            return(output)
+        
+            
+        
+        compteur +=1
+        output.append((Px,Py,Vx,Vy))
+    return(output)
 
 
 
 
+#test code _____________________________________________________________
 
+xavier = Projectile(2,1)
+xavier.acceleration.y =-0.98
+xavier.velocity = Vector(2,5)
+xavier.position = Vector(0,0.1)
+
+print(ArrayOutputFriction(xavier,10,0.1,0.1))
