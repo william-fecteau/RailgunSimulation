@@ -22,6 +22,7 @@ body, html {
     flex-direction: column;
     width:100%;
     height:100%;
+    background-color: rgb(27, 27, 27);
 }
 
 #menu {
@@ -30,6 +31,9 @@ body, html {
 }
 
 #gamefield {
-    height: var(--gamefield-height);
+    --margin: 1.5%;
+    margin: var(--margin) var(--margin) var(--margin) var(--margin);
+    width: calc(100% - 2*var(--margin));
+    height: calc(var(--gamefield-height) - 2*var(--margin));
     background-color: var(--bg-gamefield);
 }
