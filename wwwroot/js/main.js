@@ -1,22 +1,9 @@
-let _gameField = null;
-let _two = null;
+var gameField = null;
 
 
 function main() {
     monke();
     setupGamefield();
-    eventInitialisator();
-}
-
-function eventInitialisator()
-{
-    $(window).on('resize', () => {
-        console.log("RESIZE");
-        var scale = elem.offsetWidth / vuem.two.width;
-        vuem.two.scene.scale = scale;
-        vuem.two.renderer.setSize(elem.offsetWidth, elem.offsetHeight)
-        _two.renderer.trigger( Two.Events.resize, $('#gamefield').width(), $('#gamefield').height());
-    })
 }
 
 $(function() {
@@ -25,30 +12,38 @@ $(function() {
 
 
 function setupGamefield() {
-    _gameField = $("#gamefield");
+    gameField = $("#gamefield");
 
 
     // Make an instance of two and place it on the page.
-    let elem = document.getElementById('gamefield');
-    let params = { width: _gameField.width(), height: _gameField.height() };
-    _two = new Two(params).appendTo(elem);
-
-    // two has convenience methods to create shapes.
-    let circle = _two.makeCircle(72, 100, 50);
-    let rect = _two.makeRectangle(213, 100, 100, 100);
-
-    // The object returned has many stylable properties:
+    var elem = document.getElementById('gamefield');
+    var params = { width: gameField.width(), height: gameField.height() };
+    var two = new Two(params).appendTo(elem);
+ 
+    var circle = two.makeCircle(-70, 0, 50);
+    var rect = two.makeRectangle(70, 0, 100, 100);
     circle.fill = '#FF8000';
-    circle.stroke = 'orangered'; // Accepts all valid css color
-    circle.linewidth = 5;
+    rect.fill = 'rgba(0, 200, 255, 0.75)';
 
-    rect.fill = 'rgb(0, 200, 255)';
-    rect.opacity = 0.75;
-    rect.noStroke();
+    var rrectA = two.makeRoundedRectangle(400, 100, 200, 100, 10);
+    rrectA.stroke = 'blue';
+    rrectA.lineWidth = 45;
+    
+    var group = two.makeGroup(circle, rect);
+    group.translation.set(two.width / 2, two.height / 2);
+    group.scale = 0;
+    group.noStroke();
 
-    // Don't forget to tell two to render everything
-    // to the screen
-    _two.update();
+    two.bind('update', function(frameCount) {
+        // This code is called everytime two.update() is called.
+        // Effectively 60 times per second.
+        if (group.scale > 0.9999) {
+          group.scale = group.rotation = 0;
+        }
+        var t = (1 - group.scale) * 0.125;
+        group.scale += t;
+        group.rotation += t * 4 * Math.PI;
+      }).play();  // Finally, start the animation loop
 }
 
 function monke() {
