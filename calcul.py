@@ -54,6 +54,39 @@ class Projectile:
     #velocite
     #densite/volume
 
+"""
+cible:
+hauteur
+position xy 
+
+etat: brisee t/f
+
+
+comportement: 
+avant le tir: check si trajectoire passe dans la cible
+pendant le tir quand on arrive au step juste apres le moment de colision
+    set brisee a true 
+"""
+class Cible:
+    broken = False
+    def __init__(self, x,y,height):
+        self.x = x
+        self.y = y
+        self.height = height
+        self.lowerBound = y
+        self.upperBound = y+height
+    
+    def WillHitTarget(self,projectile):
+        #y=Vy/Vx *x + a/2 * x^2/Vx^2
+        Py = projectile.velocity.y/projectile.velocity.x *self.x + (projectile.acceleration.y/2)*(self.x/projectile.velocity.x)**2
+        radius = pow((3/4)*projectile.volume,1/3)
+        print("Py ",Py, " Px ", self.x, ' ', self.upperBound, " ", self.lowerBound)
+        if(Py+radius >= self.lowerBound and Py-radius <= self.upperBound):
+            return True
+        return False
+
+    
+
 
 
 
@@ -71,7 +104,8 @@ def rail_gun(voltage, mass, resistance, length, interspace):
 
 
 
-#return 
+#return un array d'array de 4 composantes
+#en ordre: position x, position y, velocite x et velocite y
 def ArrayOutput(projectile, points, timeStep):
     output = []
     for i in range(points):
@@ -96,5 +130,8 @@ def ArrayOutput(projectile, points, timeStep):
         output.append((Px,Py,Vx,Vy))
     return(output)
          
+
+
+
 
 
