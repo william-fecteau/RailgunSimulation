@@ -1,21 +1,16 @@
-let gameField = null;
-let two = null;
+let gameField = null; // Element containing the renderer
+let isSimulationRunning = false; // This lets us control if the game loop is gonna call itself
 
+// Three.js objects
+let scene = null; 
+let camera = null; 
+let renderer = null; 
+
+// Dummy cube
+let cube = null; 
 
 function main() {
-    monke();
     setupGamefield();
-    eventInitialisator();
-}
-
-function eventInitialisator()
-{
-    $(window).on('resize', () => {
-        var scale = gameField.width() / two.width;
-        two.scene.scale = scale;
-        two.renderer.setSize(gameField.width(), gameField.height())
-        two.renderer.trigger( Two.Events.resize, gameField.width(), gameField.height());
-    })
 }
 
 $(function() {
@@ -23,41 +18,58 @@ $(function() {
 });
 
 
+/*
+======================================
+            THREE.JS STUFF
+======================================
+ */
+function update() {
+    cube.rotation.x += 0.01;
+    cube.rotation.y += 0.01;
+}
+
+
+function gameLoop() {
+    if (!isSimulationRunning) return;
+
+    // Scaling camera in case the window size changes
+    if (renderer.width !== innerWidth || renderer.height !== innerHeight) {
+        renderer.setSize(innerWidth, innerHeight);
+        camera.aspect = innerWidth/innerHeight;
+        camera.updateProjectionMatrix();
+    }
+
+    update();
+    requestAnimationFrame(gameLoop);
+
+    renderer.render(scene, camera);
+};
+
+
 function setupGamefield() {
     gameField = $("#gamefield");
 
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
-    // Make an instance of two and place it on the page.
-    let elem = document.getElementById('gamefield');
-    let params = { width: gameField.width(), height: gameField.height() };
-    two = new Two(params).appendTo(elem);
- 
-    let circle = two.makeCircle(-70, 0, 50);
-    let rect = two.makeRectangle(70, 0, 100, 100);
-    circle.fill = '#FF8000';
-    rect.fill = 'rgba(0, 200, 255, 0.75)';
-
-    let rrectA = two.makeRoundedRectangle(400, 100, 200, 100, 10);
-    rrectA.stroke = 'blue';
-    rrectA.lineWidth = 45;
-    
-    let group = two.makeGroup(circle, rect);
-    group.translation.set(two.width / 2, two.height / 2);
-    group.scale = 0;
-    group.noStroke();
-
-    two.bind('update', function(frameCount) {
-        // This code is called everytime two.update() is called.
-        // Effectively 60 times per second.
-        if (group.scale > 0.9999) {
-          group.scale = group.rotation = 0;
-        }
-        let t = (1 - group.scale) * 0.125;
-        group.scale += t;
-        group.rotation += t * 4 * Math.PI;
-      }).play();  // Finally, start the animation loop
+    renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    gameField.append(renderer.domElement);
 }
 
+function cleanGameScene() {
+    while(scene.children.length > 0){ 
+        scene.remove(scene.children[0]); 
+    }
+}
+
+
+
+/*
+======================================
+                AJAX
+======================================
+ */
 function monke() {
     $.ajax({
         type: "POST",
@@ -71,3 +83,32 @@ function monke() {
         console.log(e);
     });
 }
+
+
+
+
+
+
+/*
+======================================
+                EVENTS
+======================================
+ */
+$("#start-sim").click(function() {
+    // Creating dummy cube
+    const geometry = new THREE.BoxGeometry();
+    const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+    cube = new THREE.Mesh(geometry, material);
+    scene.add(cube);
+
+    camera.position.z = 5;
+
+    isSimulationRunning = true;
+    gameLoop(); // Start it (Its gonna call itself internally)
+});
+
+$("#stop-sim").click(function() {
+    cleanGameScene();
+    gameLoop(); // Make sure its rendering a black scene
+    isSimulationRunning = false; // Stop it
+});
