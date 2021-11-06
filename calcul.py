@@ -1,5 +1,4 @@
 import math
-import numpy
 
 class Vector:
     def __init__(self,x,y):
@@ -62,17 +61,17 @@ class Projectile:
 
 #fonctions de calcul ---------------------------------------------------------
 
-def rail_gun(voltage, mass, resistance, lenght, interspace):
+def rail_gun(voltage, mass, resistance, length, interspace):
     intensity = voltage / resistance
     field = ((4 * math.pi * 10**-7) * intensity) / (2 * math.pi * (interspace / 2))
     force = intensity * field * interspace
     acc = force / mass
-    speed = math.sqrt(2 * acc * lenght)
+    speed = math.sqrt(2 * acc * length)
     return speed
 
 
 
-
+#return 
 def ArrayOutput(projectile, points, timeStep):
     output = []
     for i in range(points):
@@ -99,18 +98,3 @@ def ArrayOutput(projectile, points, timeStep):
          
 
 
-
-#test code -------------------------------------------
-
-
-
-
-print(rail_gun(120,2,1,500,1))
-
-
-ang = math.pi /18
-projectile = Projectile(10,1)
-projectile.velocity.SetPolar(rail_gun(120,2,1,500,1), ang)
-projectile.position = Vector(0,0)
-projectile.velocity.Print()
-print(ArrayOutput(projectile,10,0.2)) 
