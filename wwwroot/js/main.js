@@ -1,3 +1,5 @@
+const METER_FACTOR = 50;
+
 let gameField = null; // Element containing the renderer
 let isSimulationRunning = false; // This lets us control if the game loop is gonna call itself
 
@@ -24,7 +26,7 @@ $(function() {
 ======================================
  */
 function update() {
-    cube.position.x += 1;
+    cube.position.x += .05 * METER_FACTOR;
 }
 
 
@@ -96,10 +98,10 @@ function monke() {
  */
 $("#start-sim").click(function() {
     // Creating dummy cube
-    const geometry = new THREE.PlaneGeometry(100, 100);
+    const geometry = new THREE.PlaneGeometry(2 * METER_FACTOR, 2 * METER_FACTOR);
     const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
     cube = new THREE.Mesh(geometry, material);
-    cube.position.set(100, 100, 0);
+    cube.position.set(0, 2 * METER_FACTOR, 0);
     scene.add(cube);
 
     isSimulationRunning = true;
@@ -113,5 +115,5 @@ $("#stop-sim").click(function() {
 });
 
 $("#test").click(function() {
-    camera.translateX(10);
+    camera.translateX(1 * METER_FACTOR);
 });
