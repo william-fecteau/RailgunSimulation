@@ -6,11 +6,25 @@ let PARAMS = {
     interspace: [0.001, 10],
     angle     : [0,90],
     metals : {
-        copper: "0",
-        iron: "0",
-        gold: "0",
-        diamond: "0",
-        gorilla: "0",
+        copper: (1.6 * (10** -8)),
+        iron: (9.7 * (10** -8)),
+        lead: (22 * (10** -8)),
+        silver: (1.59 * (10** -8)),
+        gorilla: 0,
+    },
+    planet : {
+        earth: -9.8,
+        mercury: -3.8,
+        moon: -1.7,
+        jupiter: -25.93,
+        sun: -274.1,
+        titan: -1.3455
+    },
+    fluid : {
+        air: (1.8 * (10** -5)),
+        water: (1 * (10** -3)),
+        gazoline: (2.92 * (10** -4)),
+        meg: (2.14 * (10** -2))
     }
 }
 
