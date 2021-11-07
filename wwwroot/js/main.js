@@ -1,5 +1,5 @@
 const METER_FACTOR = 2;
-const FPS = 60;
+const FPS = 10;
 const cameraOffset = new THREE.Vector3(-100, 0, 0);
 
 let gameField = null; // Element containing the renderer
@@ -14,6 +14,7 @@ let yStep = 0;
 let timeStep = 0;
 let cannonLength = 0;
 let cannonAngle = 0;
+let score = 0;
 
 // Three.js objects
 let scene = null; 
@@ -52,7 +53,7 @@ function setupGamefield() {
 
 function initScene() {    
     // Creating ground
-    const geometryGround = new THREE.PlaneGeometry(10000000, 5 * METER_FACTOR);
+    const geometryGround = new THREE.PlaneGeometry(1000000000, 5 * METER_FACTOR);
     const materialGround = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
     ground = new THREE.Mesh(geometryGround, materialGround);
     ground.position.set(0, -10, 0);
@@ -90,11 +91,16 @@ function setBg (urlSkybox, urlBgTexture, callback)
             renderer.render(scene, camera);
         })
     });
+
+    // Draw only one frame to get the cannon and the ground
+    renderer.render(scene, camera);
 }
 
 function startSimulation() {
     if (isSimulationRunning) return;
     if (curSimData == null || curSimData.length == 0) return;
+
+    camera.position.set(0, 0, 0);
 
     //test d'un projectile créé avec une image
     // projectile = LoadTexture('https://threejsfundamentals.org/threejs/resources/images/wall.jpg', 200, 200);
@@ -115,12 +121,6 @@ function startSimulation() {
 
 }
 
-function cleanScene() {
-    camera.position.set(0, 0, 0)
-    while(scene.children.length > 0) { 
-        scene.remove(scene.children[0]); 
-    }
-}
 
 function stopSimulation() {
     if (projectile != null) scene.remove(projectile);
@@ -224,16 +224,17 @@ function LoadTexture(texture_name, width, height) {
 }
 
 function rotateCannon(angle) {
+    cannonAngle = angle;
+    
     if (!isSimulationRunning) {
-        cannonAngle = angle;
-        cannon.rotation.set(0, 0, 2*Math.PI*angle/360);
         // Draw only one frame to get the cannon and the ground
+        cannon.rotation.set(0, 0, 2*Math.PI*angle/360);
         renderer.render(scene, camera);
     }
 }
 
 function updateCannonLength(length) {
-    if (!isSimulationRunning) {
+    if (length != 0) {
         scene.remove(cannon);
         cannon = null;
 
@@ -242,7 +243,7 @@ function updateCannonLength(length) {
         const geometryCannon = new THREE.PlaneGeometry(length * METER_FACTOR, 10);
         const materialCannon = new THREE.MeshBasicMaterial( { color: 0x808080 } );
         cannon = new THREE.Mesh(geometryCannon, materialCannon);
-        rotateCannon(45);
+        rotateCannon(cannonAngle);
         scene.add(cannon);
 
         renderer.render(scene, camera);
@@ -268,6 +269,10 @@ function monke (params) {
         curSimData = e["data"];
         if (curSimData === null || curSimData.length == 0) return; // Add something client side to show that it exploded
     
+        lastPoint = curSimData[curSimData.length - 1];
+        score = lastPoint[0];
+        $("#sim-score").text("This simulation score : " + score + " m");
+
         cannonLength = parseFloat(params["length"]);
         cannonAngle = parseFloat(params["angle"]);
         startSimulation();
