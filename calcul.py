@@ -182,7 +182,7 @@ def Fire_Railgun(array):
 
     output = ArrayOutputFriction(projectile, points, timeStep, viscosity)
 
-    print(output)
+    return output
 
 Fire_Railgun({
     'mass'      : 10,
