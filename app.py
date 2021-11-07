@@ -12,11 +12,26 @@ def hello_world():
 
 @app.route("/ajaxRunSimulation", methods=['POST'])
 def runSimulation():
-
     params = request.get_json()
-    results = calcul.Fire_Railgun(params)
-    print (results)
+    print(params)
+    
+    params = {
+        'mass'      : '10', 
+        'volume'    : '10', 
+        'length'    : '100', 
+        'voltage'   : '100', 
+        'interspace': '0.001', 
+        'angle'     : '45', 
+        'radius'    : '10',
+        'metals'    : '0.00000000159',
+        'planet'    : '-9.8', 
+        'fluid'     : '0.000018'
+    }
+    result = calcul.Fire_Railgun(params)
+    
+    print(result)
+    
     return {
-        results
+        "data": result
     }
     
