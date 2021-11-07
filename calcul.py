@@ -155,3 +155,33 @@ def ArrayOutputFriction(projectile, points, timeStep, viscosity):
         compteur +=1
         output.append((Px,Py,Vx,Vy))
     return(output)
+
+
+def Fire_Railgun(array):
+    mass = array['mass']
+    volume = array['volume']
+    length = array['length']
+    voltage = array['voltage']
+    interspace = array['interspace']
+    angl = array['angle']
+    railradius = array['radius']
+    resistivity = array['metals']
+    accel = array['planet']
+    viscosity = array['fluid']
+
+    
+    points = 10
+    timeStep = 0.2
+
+
+    projectile = Projectile(mass,volume)
+    projectile.acceleration = accel
+
+    projectile.position.SetPolar(length, angl)
+
+    projectile.velocity.SetPolar(Rail_Gun(voltage, mass, resistivity, length, interspace, railradius), angl)
+
+    output = ArrayOutputFriction(projectile, points, timeStep, viscosity)
+    return(output)
+
+    

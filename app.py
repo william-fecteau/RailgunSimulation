@@ -13,9 +13,9 @@ def hello_world():
 def runSimulation():
 
     params = request.get_json()
-    print(params)
+    results = calcul.Fire_Railgun(params)
 
     return {
-        "data": allPositions
+        results
     }
     
