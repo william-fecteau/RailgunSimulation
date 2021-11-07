@@ -9,20 +9,23 @@
 
     <link rel="stylesheet" type="text/css" href="/style.css" media="screen" />
     <link rel="icon" type="image/png" href="/favicon.png" />
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" integrity="sha512-dLxUelApnYxpLt6K2iomGngnHO83iUvZytA3YjDUCjT0HDOHKXnVYdf3hU4JjM8uEhxf9nD1/ey98U3t2vZ0qQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script></head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" integrity="sha512-dLxUelApnYxpLt6K2iomGngnHO83iUvZytA3YjDUCjT0HDOHKXnVYdf3hU4JjM8uEhxf9nD1/ey98U3t2vZ0qQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
 
 <body>
     <main class="main-container">
         <menu id="menu" class="sections">
             <!-- Menu controlers go here -->
             MENU
-            <button id="start-sim" type="button">Start simulation</button>
-            <button id="stop-sim" type="button">Stop simulation</button>
-            <button id="test" type="button">Translate left</button>
+            <form id="send-form" action="javascript:handleSubmit()">
+                <!--button id="start-sim" type="button">Start simulation</button>
+                <button id="stop-sim" type="button">Stop simulation</button>
+                <button id="test" type="button">Translate left</button-->
+            </form>
         </menu>
         <div id="gamefield" class="sections">
             <!-- Simulation goes here -->

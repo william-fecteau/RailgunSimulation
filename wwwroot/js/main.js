@@ -70,11 +70,11 @@ function cleanGameScene() {
                 AJAX
 ======================================
  */
-function monke() {
+function monke(params) {
     $.ajax({
         type: "POST",
         url: document.location.href  + "/ajaxRunSimulation",
-        data: JSON.stringify({ "nbPoints": 6 }),
+        data: JSON.stringify(params),
         contentType: "application/json; charset=utf-8",
         dataType: "json",
     }).done(function(e) {
