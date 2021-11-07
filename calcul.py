@@ -127,13 +127,15 @@ def ArrayOutput(projectile, points, timeStep):
         output.append((Px,Py,Vx,Vy))
     return(output)
          
-def ArrayOutputFriction(projectile, points, timeStep, friction):
+def ArrayOutputFriction(projectile, points, timeStep, viscosity):
     output = []
     compteur =0
     for i in range(points):
         time = i*timeStep
 
-        #calcul de la velocity 
+        #calcul de la velocity
+
+        friction = 6 * math.pi * viscosity * ((projectile.volume / 4 * math.pi)**(1/3))
 
         c = projectile.mass * projectile.velocity.x/friction
         Vx = (c*friction/projectile.mass)*math.exp(-friction*time/projectile.mass)
