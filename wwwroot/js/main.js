@@ -63,17 +63,19 @@ function initScene() {
     const geometryCannon = new THREE.PlaneGeometry(50 * METER_FACTOR, 10);
     const materialCannon = new THREE.MeshBasicMaterial( { color: 0x808080 } );
     cannon = new THREE.Mesh(geometryCannon, materialCannon);
+    cannon.renderOrder = 99999;
     rotateCannon(45);
     scene.add(cannon);
 
     // set bg + render once
-    setBg('/Images/skybox-mercucy.png','/Images/foreground-mercury.png', 
+    setBg('/Images/foreground-mercury.png', '/Images/skybox-mercury.png',
             () => {scene.render(scene, camera)}
         );
 }
 
-function setBg (urlSkybox, urlBgTexture, callback)
+function setBg (urlBgTexture, urlSkybox, callback)
 {
+    if (isSimulationRunning) return;
     bgTexture = new THREE.TextureLoader().load(urlBgTexture, function (bgTexture) {
         skyBox = new THREE.TextureLoader().load(urlSkybox, function (skybox) {
             let geoBg = new THREE.PlaneGeometry(bgTexture.image.width*100, bgTexture.image.height);
@@ -81,9 +83,9 @@ function setBg (urlSkybox, urlBgTexture, callback)
             bgTexture.wrapS = THREE.RepeatWrapping;
             bgTexture.repeat.set(100,1);
             const matBg = new THREE.MeshBasicMaterial( { map: bgTexture, transparent: true} );
-            let background = new THREE.Mesh(geoBg, matBg);
+            scene.remove(background);
+            background = new THREE.Mesh(geoBg, matBg);
             background.position.set(-50, bgTexture.image.height /2, 0);
-            background.renderOrder = -9999;
             scene.add(background);
             scene.background = skybox;
             
