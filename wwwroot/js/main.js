@@ -9,11 +9,13 @@ let frameCounter = 0;
 // Simulation data
 let curSimData = null; // Simulation data calculated by the backend
 let curStep = 0; // Current simulation step reached relative to the fixed time stamp
-let heightToGround = 0;
 let xStep = 0;
 let yStep = 0;
 let cannonLength = 0;
 let cannonAngle = 0;
+// camera propreties
+let heightToGround = 0;
+let cameraSize = [0, 0];
 
 // Three.js objects
 let scene = null; 
@@ -51,6 +53,8 @@ function startSimulation() {
     if (curSimData == null || curSimData.length == 0) return;
     
     cleanScene()
+
+    heightToGround = gameField.height();
 
     camera.position.set(0, 0, 0)
 
@@ -100,18 +104,34 @@ function stopSimulation() {
 function gameLoop() {
     if (!isSimulationRunning) return;
 
+    let newX = projectile.position.x - gameField.width()/4;
+    let newY = (projectile.position.y - gameField.height()/2)*-1;
+
     // Scaling camera in case the window size changes
     if (renderer.width !== gameField.width() || renderer.height !== gameField.height()) {
         renderer.setSize(gameField.width(), gameField.height());
         heightToGround = gameField.height();
     }
 
-    if(camera.position.y < heightToGround)
+    if(newY < -1*heightToGround)
     {
-        camera.position.set(projectile);
-        camera.updateProjectionMatrix();
+        newY = -1*heightToGround;
     }
 
+    params = {
+        FullWidth : gameField.width(), 
+        fullHeight : gameField.height(), 
+        x : newX, 
+        y : newY, 
+        width : gameField.width(), 
+        height : gameField.height()
+    }
+
+    camera.setViewOffset(gameField.width(), gameField.height(), newX, newY, gameField.width(), gameField.height());
+    camera.updateProjectionMatrix();
+
+    console.log("camera: "  + "(" + newX + ":" + newY + ")");
+    console.log("object: "  + "(" + projectile.position.x + ":" + projectile.position.y + ")");
     update();
     
     renderer.render(scene, camera);
