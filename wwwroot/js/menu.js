@@ -1,11 +1,12 @@
 let PARAMS = {
-    mass      : [1, 100],
-    volume    : [1, 100], 
-    length    : [1, 100],
-    voltage   : [0.01, 10],
-    interspace: [0.001, 10],
-    angle     : [0,90],
-    radius    : [0.1, 100],
+    //          min,    max,    step    default 
+    mass      : [1,     100,    1,      50],
+    volume    : [1,     100,    1,      50], 
+    length    : [1,     100,    1,      50],
+    voltage   : [1,     10,     0.01,   5],
+    interspace: [0.001, 10,     0.001,  5],
+    angle     : [0,     90,     1,      45],
+    radius    : [1,   100,      1,      50],
     metals : {
         copper: (1.6 * (10** -8)),
         iron: (9.7 * (10** -8)),
@@ -67,22 +68,27 @@ function initializeMenu() {
             div.append(select);
         }
         else {
-            div.append( // slider
+            let range =  // slider
                 $('<input>', {
                     class : "range",
                     type: "range",
                     id: `${prop}-controler`,
                     name: `${prop}`,
-                    step: PARAMS[prop][0],
-                    "min": PARAMS[prop][0],
-                    "max": PARAMS[prop][1]
-                }).on("input", (event) => (updateTextInput(`${prop}-counter`, event.target.value)))
-            );
+                    min: PARAMS[prop][0],
+                    max: PARAMS[prop][1],
+                    step: PARAMS[prop][2],
+                    value: PARAMS[prop][3]
+                }).on("input", (event) => (updateTextInput(`${prop}-counter`, event.target.value)));
+            div.append(range);
             div.append( // counter
                 $('<input>', {
                     class : "number-input",
                     type: "text",
-                    id: `${prop}-counter`
+                    id: `${prop}-counter`,
+                    value: PARAMS[prop][3]
+                }).on("input", (event) => {
+                    event.target.value = event.target.value.replace(/[^0-9.]/g, '');
+                    $(`#${prop}-controler`).val(event.target.value);
                 })
             );
         }

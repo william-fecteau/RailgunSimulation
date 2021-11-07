@@ -45,6 +45,7 @@ body, html {
 
 .number-input {
     background-color:rgba(0,0,0,0);
+    color:blanchedalmond;
     border:none;
     width: 7ch;
 }
