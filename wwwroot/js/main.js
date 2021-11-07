@@ -65,20 +65,30 @@ function initScene() {
     rotateCannon(45);
     scene.add(cannon);
 
-    // Creating background
-    const bgTexture = new THREE.TextureLoader().load('/images/mars-bg.jpg', function (bgTexture) {
-        let geoBg = new THREE.PlaneGeometry(bgTexture.image.width*100, bgTexture.image.height*5);
-        bgTexture.magFilter = THREE.LinearFilter;
-        bgTexture.wrapS = THREE.RepeatWrapping;
-        bgTexture.repeat.set(100,1);
-        const matBg = new THREE.MeshBasicMaterial( { map: bgTexture} );
-        let background = new THREE.Mesh(geoBg, matBg);
-        background.position.set(-50, bgTexture.image.height * 2 , 0);
-        background.renderOrder = -9999;
-        scene.add(background);
-        
-        // Draw only one frame to get the cannon and the ground
-        renderer.render(scene, camera);
+    // set bg + render once
+    setBg('/Images/skybox-mercucy.png','/Images/foreground-mercury.png', 
+            () => {scene.render(scene, camera)}
+        );
+}
+
+function setBg (urlSkybox, urlBgTexture, callback)
+{
+    bgTexture = new THREE.TextureLoader().load(urlBgTexture, function (bgTexture) {
+        skyBox = new THREE.TextureLoader().load(urlSkybox, function (skybox) {
+            let geoBg = new THREE.PlaneGeometry(bgTexture.image.width*100, bgTexture.image.height);
+            bgTexture.magFilter = THREE.LinearFilter;
+            bgTexture.wrapS = THREE.RepeatWrapping;
+            bgTexture.repeat.set(100,1);
+            const matBg = new THREE.MeshBasicMaterial( { map: bgTexture} );
+            let background = new THREE.Mesh(geoBg, matBg);
+            background.position.set(-50, 0 , 0);
+            background.renderOrder = -9999;
+            scene.add(background);
+            scene.background = skybox;
+            
+            // Draw only one frame to get the cannon and the ground
+            renderer.render(scene, camera);
+        })
     });
 }
 
@@ -91,16 +101,18 @@ function startSimulation() {
     //test d'un projectile créé avec une image
 
     // Creating projectile
-    const geometry = new THREE.PlaneGeometry(5 * METER_FACTOR, 5 * METER_FACTOR,);
-    const material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
-    projectile = new THREE.Mesh(geometry, material);
-    projectile.position.set(0, 0, 0);
-    scene.add(projectile);
-    
-    curStep = 0;
-    frameCounter = 0;
-    isSimulationRunning = true;
-    gameLoop(); // Start it (Its gonna call itself internally)
+    const geometry = new THREE.PlaneGeometry(10 * METER_FACTOR, 10 * METER_FACTOR,);
+    let monkey = new THREE.TextureLoader().load("/images/monke.png", (monke) => {
+        const material = new THREE.MeshBasicMaterial( { map: monke, transparent: true} );
+        projectile = new THREE.Mesh(geometry, material);
+        projectile.position.set(0, 0, 0);
+        scene.add(projectile);
+        curStep = 0;
+        frameCounter = 0;
+        isSimulationRunning = true;
+        gameLoop(); // Start it (Its gonna call itself internally)
+    });
+
 }
 
 function cleanScene() {

@@ -105,6 +105,9 @@ function initializeMenu() {
 
 function menu() {
     initializeMenu();
+    $("#planet").on("change", (event)=>{
+        
+    });
 }
 
 $(function() {
