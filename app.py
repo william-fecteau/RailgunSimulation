@@ -1,6 +1,7 @@
-from flask import Flask, request
+from flask import Flask, request, send_file, current_app as app
 import calcul
 import json
+import os
 
 app = Flask(__name__,
             static_url_path='', 
@@ -22,3 +23,7 @@ def runSimulation():
         "data": result
     }
     
+@app.route('/doc')
+def show_static_pdf():
+    static_file = open('Hackathon_2021-3_1.pdf', 'rb')
+    return send_file(static_file, attachment_filename='file.pdf')
