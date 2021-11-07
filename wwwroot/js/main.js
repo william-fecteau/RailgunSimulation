@@ -1,5 +1,4 @@
 const METER_FACTOR = 2;
-const TIME_STEP = 0.2;
 const FPS = 60;
 const cameraOffset = new THREE.Vector3(-100, 0, 0);
 
@@ -12,6 +11,7 @@ let curSimData = null; // Simulation data calculated by the backend
 let curStep = 0; // Current simulation step reached relative to the fixed time stamp
 let xStep = 0;
 let yStep = 0;
+let timeStep = 0;
 let cannonLength = 0;
 let cannonAngle = 0;
 
@@ -39,7 +39,7 @@ $(function() {
  */
 function setupGamefield() {
     scene = new THREE.Scene();
-    camera = new THREE.OrthographicCamera(0, gameField.width(), gameField.height(), -10, -1, 1);
+    camera = new THREE.OrthographicCamera(-10, gameField.width(), gameField.height(), -10, -1, 1);
 
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(gameField.width(), gameField.height());
@@ -68,16 +68,15 @@ function startSimulation() {
     cannon.rotation.set(0, 0, 2*Math.PI*cannonAngle/360);
     scene.add(cannon);
 
-    // Creating projectile
-    const geometry = new THREE.PlaneGeometry(5 * METER_FACTOR, 5 * METER_FACTOR);
-    const material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
-    projectile = new THREE.Mesh(geometry, material);
-    projectile.position.set(curSimData[0][0] * METER_FACTOR, curSimData[0][1] * METER_FACTOR, 0);
-
     //test d'un projectile créé avec une image
     // projectile = LoadTexture('https://threejsfundamentals.org/threejs/resources/images/wall.jpg', 200, 200);
     //test d'un projectile créé avec une image
 
+    // Creating projectile
+    const geometry = new THREE.PlaneGeometry(5 * METER_FACTOR, 5 * METER_FACTOR,);
+    const material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
+    projectile = new THREE.Mesh(geometry, material);
+    projectile.position.set(0, 0, 0);
     scene.add(projectile);
     
     curStep = 0;
@@ -103,7 +102,6 @@ function gameLoop() {
     // Scaling camera in case the window size changes
     if (renderer.width !== gameField.width() || renderer.height !== gameField.height()) {
         renderer.setSize(gameField.width(), gameField.height());
-        heightToGround = gameField.height();
     }
 
     update();
@@ -155,6 +153,7 @@ function update() {
         camera.translateX(xStep);
     }
 
+    console.log(projectile.position.x + ", " + projectile.position.y);
     projectile.position.x += xStep;
     projectile.position.y += yStep;
 
