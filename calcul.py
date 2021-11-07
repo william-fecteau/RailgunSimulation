@@ -1,5 +1,7 @@
 import math
 
+MAX_TIME_SEC = 10
+
 class Vector:
     def __init__(self,x,y):
         self.x = x
@@ -163,22 +165,24 @@ def Fire_Railgun(array):
     length =        float(array['length'])
     voltage =       float(array['voltage'])
     interspace =    float(array['interspace'])
-    angl =          float(array['angle'])
+    angl =          float(float(array['angle']) * math.pi / 180)
     railradius =    float(array['radius'])
     resistivity =   float(array['metals'])
     accel =         float(array['planet'])
     viscosity =     float(array['fluid'])
-    points =        10
-    timeStep =      .2
+    points =        MAX_TIME_SEC
 
-    
 
     projectile = Projectile(mass,volume)
     projectile.acceleration = accel
 
     projectile.position.SetPolar(length, angl)
 
-    projectile.velocity.SetPolar(Rail_Gun(voltage, mass, resistivity, length, interspace, railradius), angl)
+    velocity = Rail_Gun(voltage, mass, resistivity, length, interspace, railradius)
+    projectile.velocity.SetPolar(velocity, angl)
+
+    total_time = (-velocity) / (projectile.acceleration / 2)
+    timeStep = total_time / MAX_TIME_SEC
 
     output = ArrayOutputFriction(projectile, points, timeStep, viscosity)
 
