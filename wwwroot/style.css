@@ -2,8 +2,8 @@
     --bg-menu: rgb(23, 50, 100);
     --bg-gamefield: rgb(15, 15, 15);
     --label-font-color: rgb(255, 255, 255);
-    --menu-height: 25%;
-    --gamefield-height: calc(100% - var(--menu-height));
+    --menu-height: 20%;
+    --gamefield-height: calc(75% - var(--menu-height));
 }
 
 body, html {
@@ -61,6 +61,50 @@ body, html {
     margin-right:5px;
 }
 
+
+.footer-container {
+	background-color: #212329;
+	padding-top: 1rem;
+}
+
+.footer {
+    font-family: Arial;
+	width: 80%;
+	height: 10%;
+	background-color: #212329;
+	color: #fff;
+	display: flex;
+	justify-content: center;
+	flex-wrap: wrap;
+	margin: 0 auto;
+}
+
+.footer-heading {
+	display: flex;
+	flex-direction: column;
+	margin-right: 4rem;
+}
+
+.footer-heading h2 {
+    font-size: 1.5rem;
+	margin-bottom: 0.5rem;
+}
+
+.footer-heading h3 {
+	font-size: 0.75rem;
+    color: rgba(141, 163, 184, 0.344);
+}
+
+.footer-heading a {
+	color: #fff;
+	text-decoration: none;
+	margin-bottom:0.5rem;
+}
+
+.footer-heading a:hover {
+	color: red;
+	text-decoration: none;
+	transition: 0.3s ease-out;
 #buttons {
     margin-top: 20px; 
     text-align: center;
