@@ -105,8 +105,8 @@ function initializeMenu() {
 
 function menu() {
     initializeMenu();
-    $("#planet").val(PARAMS.planet.mercury);
-    $("#planet").on("change", (event)=>{
+    $("#planet-controler").val(PARAMS.planet.mercury);
+    $("#planet-controler").on("change", (event)=>{
         let planet = {
             earth: ["Images/foreground-earth.png", "Images/skybox-earth.png"],
             mercury: ["Images/foreground-mercury.png", "Images/skybox-mercury.png"],
