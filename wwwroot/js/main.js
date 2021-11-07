@@ -149,14 +149,14 @@ function PlaySound(filename) {
                 EVENTS
 ======================================
  */
-$("#start-sim").click(function() {
+function monke (params) {
     if (isSimulationRunning) return;
 
     // Calculating simulation
     $.ajax({
         type: "POST",
         url: document.location.href  + "/ajaxRunSimulation",
-        data: JSON.stringify({ "nbPoints": 6 }),
+        data: JSON.stringify(params),
         contentType: "application/json; charset=utf-8",
         dataType: "json",
     }).done(function(e) {
@@ -167,7 +167,9 @@ $("#start-sim").click(function() {
     }).fail(function(e) {
         console.log(e);
     });
-});
+};
+
+$("#start-sim").click(function() {monke({ "nbPoints": 6 })});
 
 $("#stop-sim").click(function() {
     stopSimulation();

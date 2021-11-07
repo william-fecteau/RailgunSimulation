@@ -37,3 +37,23 @@ body, html {
     height: calc(var(--gamefield-height) - 2*var(--margin));
     background-color: var(--bg-gamefield);
 }
+
+#send-form {
+    padding:2%;
+}
+
+.number-input {
+    background-color:rgba(0,0,0,0);
+    border:none;
+    width: 7ch;
+}
+
+.range {
+    margin-left: 10px;
+}
+
+.div-form {
+    display:inline-block;
+    color:firebrick;
+    margin-right:5px;
+}
