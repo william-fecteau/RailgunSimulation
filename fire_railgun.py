@@ -11,29 +11,32 @@ import math
 mass = 1
 volume = 1
 length = 5 
-angl = math.pi/2
+angl = math.pi/4
 voltage = 10000
-resistivity = 1
-railradius = 1
+resistivity = 0.0001
+railradius = 10
 interspace = 0.001
-viscosity = 1**-8
+viscosity = 10**-8
 accel = -9.8
 
 points = 10
 timeStep = 0.2
 
 
-projectile = calcul.Projectile(mass,volume,accel)
+projectile = calcul.Projectile(mass,volume)
+projectile.acceleration = accel
 
 projectile.position.SetPolar(length, angl)
 
-projectile.velocity.SetPolar(calcul.rail_gun(voltage, mass, resistivity, length, interspace, railradius), angl)
+projectile.velocity.SetPolar(calcul.Rail_Gun(voltage, mass, resistivity, length, interspace, railradius), angl)
+print(calcul.Rail_Gun(voltage, mass, resistivity, length, interspace, railradius))
 
 output = calcul.ArrayOutputFriction(projectile, points, timeStep, viscosity)
 
 outpute = calcul.ArrayOutput(projectile, points, timeStep)
 
 print(output)
+
 print(outpute)
 
 
