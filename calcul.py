@@ -30,11 +30,11 @@ class Vector:
 
 
 class Projectile:
-    def __init__(self,mass,volume, acceleration):
+    def __init__(self,mass,volume):
         self.mass = mass
         self.velocity = Vector(0,0)
         self.position = Vector(0,0)
-        self.acceleration = acceleration
+        self.acceleration = 0
         self.volume = volume
 
 
@@ -80,8 +80,8 @@ class Cible:
   
 
 #fonctions de calcul ---------------------------------------------------------
-def rail_gun(voltage, mass, resistivity, length, interspace, railradius):
-    resistance = (resistivity * 2 * length) / (((railradius / 1000)**2) * math.pi)
+def Rail_Gun(voltage, mass, resistivity, length, interspace, railradius):
+    resistance = (resistivity * 2 * length) / (((railradius / 1000)**2) * math.pi) #candidat 2 
     intensity = voltage / resistance
     field = ((4 * math.pi * 10**-7) * intensity) / ( math.pi * (interspace / 2))
     force = intensity * field * interspace
@@ -98,11 +98,11 @@ def ArrayOutput(projectile, points, timeStep):
         time = i*timeStep
 
         #calcul de la velocity 
-        Vx = projectile.velocity.x + projectile.acceleration *time
+        Vx = projectile.velocity.x
         Vy = projectile.velocity.y + projectile.acceleration *time
 
 
-        Px = projectile.velocity.x *time +projectile.position.x + (projectile.acceleration/2)*(time**2)
+        Px = projectile.velocity.x *time +projectile.position.x
         #calcul de la position
         Py = max(0,projectile.velocity.y *time + (projectile.acceleration/2)*(time**2) + projectile.position.y)
         if(Py == 0): #impact avec le sol, le mouvement s'arrete
@@ -123,8 +123,9 @@ def ArrayOutputFriction(projectile, points, timeStep, viscosity):
 
         #calcul de la velocity
 
+        #candidat 1
         friction = 6 * math.pi * viscosity * ((projectile.volume / 4 * math.pi)**(1/3))
-
+        
         c = projectile.mass * projectile.velocity.x/friction
         Vx = (c*friction/projectile.mass)*math.exp(-friction*time/projectile.mass)
 
