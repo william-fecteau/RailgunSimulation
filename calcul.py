@@ -158,16 +158,16 @@ def ArrayOutputFriction(projectile, points, timeStep, viscosity):
 
 
 def Fire_Railgun(array):
-    mass = array['mass']
-    volume = array['volume']
-    length = array['length']
-    voltage = array['voltage']
-    interspace = array['interspace']
-    angl = array['angle']
-    railradius = array['radius']
-    resistivity = array['metals']
-    accel = array['planet']
-    viscosity = array['fluid']
+    mass =          float(array['mass'])
+    volume =        float(array['volume'])
+    length =        float(array['length'])
+    voltage =       float(array['voltage'])
+    interspace =    float(array['interspace'])
+    angl =          float(array['angle'])
+    railradius =    float(array['radius'])
+    resistivity =   float(array['metals'])
+    accel =         float(array['planet'])
+    viscosity =     float(array['fluid'])
 
     
     points = 10

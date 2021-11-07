@@ -1,5 +1,6 @@
 from flask import Flask, request
 import calcul
+import json
 
 app = Flask(__name__,
             static_url_path='', 
@@ -14,7 +15,7 @@ def runSimulation():
 
     params = request.get_json()
     results = calcul.Fire_Railgun(params)
-
+    print (results)
     return {
         results
     }

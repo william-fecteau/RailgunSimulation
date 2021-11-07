@@ -5,6 +5,7 @@ let PARAMS = {
     voltage   : [1, 10000],
     interspace: [0.001, 10],
     angle     : [0,90],
+    radius    : [0.1, 100],
     metals : {
         copper: (1.6 * (10** -8)),
         iron: (9.7 * (10** -8)),
