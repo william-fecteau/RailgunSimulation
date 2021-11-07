@@ -80,7 +80,6 @@ class Cible:
   
 
 #fonctions de calcul ---------------------------------------------------------
-
 def rail_gun(voltage, mass, resistivity, length, interspace, railradius):
     resistance = (resistivity * 2 * length) / (((railradius / 1000)**2) * math.pi)
     intensity = voltage / resistance
@@ -99,13 +98,13 @@ def ArrayOutput(projectile, points, timeStep):
         time = i*timeStep
 
         #calcul de la velocity 
-        Vx = projectile.velocity.x + projectile.acceleration.x *time
-        Vy = projectile.velocity.y + projectile.acceleration.y *time
+        Vx = projectile.velocity.x + projectile.acceleration *time
+        Vy = projectile.velocity.y + projectile.acceleration *time
 
 
-        Px = projectile.velocity.x *time +projectile.position.x + (projectile.acceleration.y/2)*(time**2)
+        Px = projectile.velocity.x *time +projectile.position.x + (projectile.acceleration/2)*(time**2)
         #calcul de la position
-        Py = max(0,projectile.velocity.y *time + (projectile.acceleration.y/2)*(time**2) + projectile.position.y)
+        Py = max(0,projectile.velocity.y *time + (projectile.acceleration/2)*(time**2) + projectile.position.y)
         if(Py == 0): #impact avec le sol, le mouvement s'arrete
             output.append((Px,Py,Vx,Vy))
             return(output)
