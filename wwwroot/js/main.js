@@ -1,6 +1,7 @@
-const METER_FACTOR = 10;
+const METER_FACTOR = 2;
 const TIME_STEP = 0.2;
 const FPS = 60;
+const cameraOffset = new THREE.Vector3(-100, 0, 0);
 
 let gameField = null; // Element containing the renderer
 let isSimulationRunning = false; // This lets us control if the game loop is gonna call itself
@@ -54,7 +55,7 @@ function startSimulation() {
     camera.position.set(0, 0, 0)
 
     // Creating ground
-    const geometryGround = new THREE.PlaneGeometry(100000, 100);
+    const geometryGround = new THREE.PlaneGeometry(10000000, 5 * METER_FACTOR);
     const materialGround = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
     ground = new THREE.Mesh(geometryGround, materialGround);
     ground.position.set(0, -10, 0);
@@ -68,10 +69,10 @@ function startSimulation() {
     scene.add(cannon);
 
     // Creating projectile
-    const geometry = new THREE.PlaneGeometry(1 * METER_FACTOR, 1 * METER_FACTOR);
+    const geometry = new THREE.PlaneGeometry(5 * METER_FACTOR, 5 * METER_FACTOR);
     const material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
     projectile = new THREE.Mesh(geometry, material);
-    projectile.position.set(curSimData[0][0], curSimData[0][1], 0);
+    projectile.position.set(curSimData[0][0] * METER_FACTOR, curSimData[0][1] * METER_FACTOR, 0);
 
     //test d'un projectile créé avec une image
     // projectile = LoadTexture('https://threejsfundamentals.org/threejs/resources/images/wall.jpg', 200, 200);
@@ -145,7 +146,14 @@ function update() {
         }
 
         // Setting exact position to avoid some float weirdness
-        projectile.position.set(x, y, 0);
+        projectile.position.set(x * METER_FACTOR, y * METER_FACTOR, 0);
+    }
+
+    if (projectile.position.y > (gameField.height() / 2)) {
+        camera.translateY(yStep);
+    }
+    if (projectile.position.x >= (gameField.width() / 2)) {
+        camera.translateX(xStep);
     }
 
     projectile.position.x += xStep;
@@ -208,6 +216,25 @@ $("#stop-sim").click(function() {
     isSimulationRunning = false;
 });
 
-$("#test").click(function() {
-    camera.translateX(1 * METER_FACTOR);
+$(document).keydown(function(event) {
+    var key = (event.keyCode ? event.keyCode : event.which);
+    const factor = 5;
+
+
+    if (key == 87) {
+        //UP
+        camera.translateY(factor * METER_FACTOR);
+    }
+    if (key == 65) {
+        //LEFT
+        camera.translateX(-factor * METER_FACTOR);
+    }
+    if (key == 83) {
+        //DOWN
+        camera.translateY(-factor * METER_FACTOR);
+    }
+    if (key == 68) {
+        //RIGHT
+        camera.translateX(factor * METER_FACTOR);
+    }
 });

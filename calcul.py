@@ -168,7 +168,7 @@ def Fire_Railgun(array):
     resistivity =   float(array['metals'])
     accel =         float(array['planet'])
     viscosity =     float(array['fluid'])
-    points =        10
+    points =        1000
     timeStep =      .2
 
     
