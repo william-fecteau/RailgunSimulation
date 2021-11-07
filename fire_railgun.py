@@ -12,11 +12,11 @@ mass = 1
 volume = 1
 length = 5 
 angl = math.pi/2
-voltage = 1000000
-resistivity = 1 
+voltage = 10000
+resistivity = 1
 railradius = 1
 interspace = 0.001
-viscosity = 1**-4
+viscosity = 1**-8
 accel = -9.8
 
 points = 10
@@ -31,7 +31,10 @@ projectile.velocity.SetPolar(calcul.rail_gun(voltage, mass, resistivity, length,
 
 output = calcul.ArrayOutputFriction(projectile, points, timeStep, viscosity)
 
+outpute = calcul.ArrayOutput(projectile, points, timeStep)
+
 print(output)
+print(outpute)
 
 
 #renvoyer output au front end pour affichage
