@@ -1,5 +1,5 @@
 const METER_FACTOR = 2;
-const FPS = 60;
+const FPS = 10;
 const cameraOffset = new THREE.Vector3(-100, 0, 0);
 
 let gameField = null; // Element containing the renderer
@@ -53,7 +53,7 @@ function setupGamefield() {
 
 function initScene() {    
     // Creating ground
-    const geometryGround = new THREE.PlaneGeometry(10000000, 5 * METER_FACTOR);
+    const geometryGround = new THREE.PlaneGeometry(1000000000, 5 * METER_FACTOR);
     const materialGround = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
     ground = new THREE.Mesh(geometryGround, materialGround);
     ground.position.set(0, -10, 0);
