@@ -77,10 +77,10 @@ function initScene() {
         background.position.set(-50, bgTexture.image.height * 2 , 0);
         background.renderOrder = -9999;
         scene.add(background);
-        
-        // Draw only one frame to get the cannon and the ground
-        renderer.render(scene, camera);
     });
+
+    // Draw only one frame to get the cannon and the ground
+    renderer.render(scene, camera);
 }
 
 function startSimulation() {
