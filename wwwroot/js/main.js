@@ -21,6 +21,7 @@ let camera = null;
 let renderer = null; 
 let projectile = null;  // Projectile object
 let cannon = null;
+let background = null;
 
 
 function main() {
@@ -49,7 +50,7 @@ function setupGamefield() {
     initScene();
 }
 
-function initScene() {
+function initScene() {    
     // Creating ground
     const geometryGround = new THREE.PlaneGeometry(10000000, 5 * METER_FACTOR);
     const materialGround = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
@@ -64,8 +65,21 @@ function initScene() {
     rotateCannon(45);
     scene.add(cannon);
 
-    // Draw only one frame to get the cannon and the ground
-    renderer.render(scene, camera);
+    // Creating background
+    const bgTexture = new THREE.TextureLoader().load('/images/mars-bg.jpg', function (bgTexture) {
+        let geoBg = new THREE.PlaneGeometry(bgTexture.image.width*100, bgTexture.image.height*5);
+        bgTexture.magFilter = THREE.LinearFilter;
+        bgTexture.wrapS = THREE.RepeatWrapping;
+        bgTexture.repeat.set(100,1);
+        const matBg = new THREE.MeshBasicMaterial( { map: bgTexture} );
+        let background = new THREE.Mesh(geoBg, matBg);
+        background.position.set(-50, bgTexture.image.height * 2 , 0);
+        background.renderOrder = -9999;
+        scene.add(background);
+        
+        // Draw only one frame to get the cannon and the ground
+        renderer.render(scene, camera);
+    });
 }
 
 function startSimulation() {
