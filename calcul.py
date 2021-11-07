@@ -83,6 +83,7 @@ class Cible:
             return True
         return False
 
+
     
 
 
@@ -92,7 +93,8 @@ class Cible:
 
 #fonctions de calcul ---------------------------------------------------------
 
-def rail_gun(voltage, mass, resistance, length, interspace):
+def rail_gun(voltage, mass, resistivity, length, interspace, railradius):
+    resistance = (resistivity * 2 * length) / (((railradius / 1000)^2) * math.pi)
     intensity = voltage / resistance
     field = ((4 * math.pi * 10**-7) * intensity) / ( math.pi * (interspace / 2))
     force = intensity * field * interspace
