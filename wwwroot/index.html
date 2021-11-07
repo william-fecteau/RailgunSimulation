@@ -19,12 +19,11 @@
 <body>
     <main class="main-container">
         <menu id="menu" class="sections">
-            <!-- Menu controlers go here -->
-            MENU
             <form id="send-form" action="javascript:handleSubmit()">
-                <button id="start-sim" type="button">Start simulation</button>
-                <button id="stop-sim" type="button">Stop simulation</button>
-                <button id="test" type="button">Translate left</button>
+                <div id="controlers"></div>
+                <input id="submit-btn" value="Simulate" class="btn btn-outline-warning" name="Simulate"  type="submit"/>
+                <button id="stop-sim" type="button" class="btn btn-outline-danger">Stop simulation</button>
+                <button id="test" type="button" class="btn btn-outline-info">Translate left</button>
             </form>
         </menu>
         <div id="gamefield" class="sections">

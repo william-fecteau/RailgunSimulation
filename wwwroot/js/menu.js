@@ -21,7 +21,7 @@ function updateTextInput(id , val) {
 
 function handleSubmit()
 {
-
+    monke({ "nbPoints": 6 });
 }
 
 function initializeMenu() {
@@ -51,16 +51,8 @@ function initializeMenu() {
                 id: `${prop}-counter`
             })
         );
-        $('#send-form').append(div);
+        $('#send-form').prepend(div);
     }
-    $('#send-form').append( // counter
-        $('<input>', {
-            class : "btn btn-outline-warning",
-            type: "submit",
-            value: "Simulate",
-            id: `submit-btn`
-        })
-    );
 };
 
 /*
