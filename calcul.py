@@ -168,11 +168,10 @@ def Fire_Railgun(array):
     resistivity =   float(array['metals'])
     accel =         float(array['planet'])
     viscosity =     float(array['fluid'])
+    points =        10
+    timeStep =      .2
 
     
-    points = 10
-    timeStep = 0.2
-
 
     projectile = Projectile(mass,volume)
     projectile.acceleration = accel
@@ -182,6 +181,31 @@ def Fire_Railgun(array):
     projectile.velocity.SetPolar(Rail_Gun(voltage, mass, resistivity, length, interspace, railradius), angl)
 
     output = ArrayOutputFriction(projectile, points, timeStep, viscosity)
-    return(output)
 
-    
+    return output
+
+Fire_Railgun({
+    'mass'      : 10,
+    'volume'    : 10, 
+    'length'    : 100,
+    'voltage'   : 10000,
+    'interspace': 0.001,
+    'angle'     : 45,
+    'radius'    : 10,
+    'metals'    : (1.59 * (10**-8)),
+    'planet'    : -9.8,
+    'fluid' : (1.8 * (10** -5))
+    })
+
+Fire_Railgun({
+    'mass'      : '10', 
+    'volume'    : '10', 
+    'length'    : '100', 
+    'voltage'   : '10000', 
+    'interspace': '0.001', 
+    'angle'     : '45', 
+    'radius'    : '10',
+    'metals'    : '0.00000000159',
+    'planet'    : '-9.8', 
+    'fluid'     : '0.000018'
+    })
