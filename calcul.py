@@ -161,14 +161,14 @@ def Fire_Railgun(array):
     mass =          float(array['mass'])
     volume =        float(array['volume'])
     length =        float(array['length'])
-    voltage =       10**float(array['voltage'])
+    voltage =       float(array['voltage'])
     interspace =    float(array['interspace'])
     angl =          float(array['angle'])
     railradius =    float(array['radius'])
     resistivity =   float(array['metals'])
     accel =         float(array['planet'])
     viscosity =     float(array['fluid'])
-    points =        1000
+    points =        10
     timeStep =      .2
 
     

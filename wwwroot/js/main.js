@@ -10,7 +10,6 @@ let frameCounter = 0;
 // Simulation data
 let curSimData = null; // Simulation data calculated by the backend
 let curStep = 0; // Current simulation step reached relative to the fixed time stamp
-let heightToGround = 0;
 let xStep = 0;
 let yStep = 0;
 let cannonLength = 0;
@@ -105,12 +104,6 @@ function gameLoop() {
     if (renderer.width !== gameField.width() || renderer.height !== gameField.height()) {
         renderer.setSize(gameField.width(), gameField.height());
         heightToGround = gameField.height();
-    }
-
-    if(camera.position.y < heightToGround)
-    {
-        camera.position.set(projectile);
-        camera.updateProjectionMatrix();
     }
 
     update();
