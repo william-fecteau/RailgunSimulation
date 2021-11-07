@@ -47,6 +47,11 @@ function startSimulation() {
     const geometry = new THREE.PlaneGeometry(1 * METER_FACTOR, 1 * METER_FACTOR);
     const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
     projectile = new THREE.Mesh(geometry, material);
+
+    //test d'un projectile créé avec une image
+    // projectile = LoadTexture('https://threejsfundamentals.org/threejs/resources/images/wall.jpg', 200, 200);
+    //test d'un projectile créé avec une image
+
     projectile.position.set(1 * METER_FACTOR, 1 * METER_FACTOR, 0);
     scene.add(projectile);
     
@@ -102,6 +107,23 @@ function update() {
     }
 
     frameCounter++;
+}
+
+// Map a texture to a plane.
+// texture_name : path of the texture
+// width : width of the plane
+// height : height of the plane
+function LoadTexture(texture_name, width, height) {
+    // Initialize the loader
+    const loader = new THREE.TextureLoader();
+
+    // Load the material
+    const material = new THREE.MeshBasicMaterial({map: loader.load(texture_name)});
+
+    // Map the texture
+    const geometry = new THREE.PlaneGeometry(width, height);
+    const plane = new THREE.Mesh(geometry, material);
+    return plane;
 }
 
 
