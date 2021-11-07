@@ -1,12 +1,12 @@
 let PARAMS = {
     //          min,    max,    step    default 
-    mass      : [1,     100,    1,      50],
+    mass      : [1,     100,    1,      20],
     volume    : [1,     100,    1,      50], 
     length    : [1,     100,    1,      50],
-    voltage   : [1,     10,     0.01,   5],
+    voltage   : [1,     5,     0.01,   2.5],
     interspace: [0.001, 10,     0.001,  5],
     angle     : [0,     90,     1,      45],
-    radius    : [1,   100,      1,      50],
+    radius    : [1,   50,      1,      5],
     metals : {
         copper: (1.6 * (10** -8)),
         iron: (9.7 * (10** -8)),
@@ -34,7 +34,6 @@ let PARAMS = {
 function updateTextInput(id , val) {
     document.getElementById(id).value=val;
 }
-
 
 function handleSubmit()
 {

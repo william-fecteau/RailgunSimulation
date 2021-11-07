@@ -21,7 +21,13 @@
         <menu id="menu" class="sections">
             <form id="send-form" action="javascript:handleSubmit()">
                 <div id="controlers"></div>
-                <input id="submit-btn" value="Simulate" class="btn btn-outline-warning" name="Simulate"  type="submit"/>
+                <div id="buttons">
+                    <input id="submit-btn" value="Start simulation" class="btn btn-warning" type="submit" />
+                    <button id="stop-sim" type="button" class="btn btn-danger">Stop simulation</button> 
+                </div>
+                <div id="sim-score">
+                    
+                </div>
             </form>
         </menu>
         <div id="gamefield" class="sections">

@@ -14,6 +14,7 @@ let yStep = 0;
 let timeStep = 0;
 let cannonLength = 0;
 let cannonAngle = 0;
+let score = 0;
 
 // Three.js objects
 let scene = null; 
@@ -21,6 +22,7 @@ let camera = null;
 let renderer = null; 
 let projectile = null;  // Projectile object
 let cannon = null;
+let background = null;
 
 
 function main() {
@@ -49,7 +51,7 @@ function setupGamefield() {
     initScene();
 }
 
-function initScene() {
+function initScene() {    
     // Creating ground
     const geometryGround = new THREE.PlaneGeometry(10000000, 5 * METER_FACTOR);
     const materialGround = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
@@ -64,6 +66,19 @@ function initScene() {
     rotateCannon(45);
     scene.add(cannon);
 
+    // Creating background
+    const bgTexture = new THREE.TextureLoader().load('/images/mars-bg.jpg', function (bgTexture) {
+        let geoBg = new THREE.PlaneGeometry(bgTexture.image.width*100, bgTexture.image.height*5);
+        bgTexture.magFilter = THREE.LinearFilter;
+        bgTexture.wrapS = THREE.RepeatWrapping;
+        bgTexture.repeat.set(100,1);
+        const matBg = new THREE.MeshBasicMaterial( { map: bgTexture} );
+        let background = new THREE.Mesh(geoBg, matBg);
+        background.position.set(-50, bgTexture.image.height * 2 , 0);
+        background.renderOrder = -9999;
+        scene.add(background);
+    });
+
     // Draw only one frame to get the cannon and the ground
     renderer.render(scene, camera);
 }
@@ -71,6 +86,8 @@ function initScene() {
 function startSimulation() {
     if (isSimulationRunning) return;
     if (curSimData == null || curSimData.length == 0) return;
+
+    camera.position.set(0, 0, 0);
 
     //test d'un projectile créé avec une image
     // projectile = LoadTexture('https://threejsfundamentals.org/threejs/resources/images/wall.jpg', 200, 200);
@@ -89,17 +106,15 @@ function startSimulation() {
     gameLoop(); // Start it (Its gonna call itself internally)
 }
 
-function cleanScene() {
-    camera.position.set(0, 0, 0)
-    while(scene.children.length > 0) { 
-        scene.remove(scene.children[0]); 
-    }
-}
 
 function stopSimulation() {
-    scene.remove(projectile);
+    if (projectile != null) scene.remove(projectile);
+    projectile = null;
     isSimulationRunning = false; // Stop it, get some help
-    
+
+    updateCannonLength(cannonLength);
+    rotateCannon(cannonAngle);
+
     // Draw only one frame to get the cannon and the ground
     renderer.render(scene, camera);
 }
@@ -120,6 +135,8 @@ function gameLoop() {
 };
 
 function update() {
+    if (projectile == null) return;
+
     // Every second, update position
     if (frameCounter % FPS == 0) {
         curStep++;
@@ -192,24 +209,26 @@ function LoadTexture(texture_name, width, height) {
 }
 
 function rotateCannon(angle) {
+    cannonAngle = angle;
+    
     if (!isSimulationRunning) {
-        cannonAngle = angle;
-        cannon.rotation.set(0, 0, 2*Math.PI*angle/360);
         // Draw only one frame to get the cannon and the ground
+        cannon.rotation.set(0, 0, 2*Math.PI*angle/360);
         renderer.render(scene, camera);
     }
 }
 
 function updateCannonLength(length) {
-    if (!isSimulationRunning) {
+    if (length != 0) {
         scene.remove(cannon);
         cannon = null;
-        
+
+        cannonLength = length;
         // Re-creating cannon with good lenght
         const geometryCannon = new THREE.PlaneGeometry(length * METER_FACTOR, 10);
         const materialCannon = new THREE.MeshBasicMaterial( { color: 0x808080 } );
         cannon = new THREE.Mesh(geometryCannon, materialCannon);
-        rotateCannon(45);
+        rotateCannon(cannonAngle);
         scene.add(cannon);
 
         renderer.render(scene, camera);
@@ -235,6 +254,10 @@ function monke (params) {
         curSimData = e["data"];
         if (curSimData === null || curSimData.length == 0) return; // Add something client side to show that it exploded
     
+        lastPoint = curSimData[curSimData.length - 1];
+        score = lastPoint[0];
+        $("#sim-score").text("This simulation score : " + score + " m");
+
         cannonLength = parseFloat(params["length"]);
         cannonAngle = parseFloat(params["angle"]);
         startSimulation();
@@ -243,6 +266,11 @@ function monke (params) {
     });
 };
 
+$("#stop-sim").click(function() {
+    stopSimulation();
+});
+
+/*
 $(document).keydown(function(event) {
     var key = (event.keyCode ? event.keyCode : event.which);
     const factor = 5;
@@ -265,3 +293,4 @@ $(document).keydown(function(event) {
         camera.translateX(factor * METER_FACTOR);
     }
 });
+*/
