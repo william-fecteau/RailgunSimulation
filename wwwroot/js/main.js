@@ -1,18 +1,25 @@
-const METER_FACTOR = 50;
+const METER_FACTOR = 2;
+const FPS = 60;
+const cameraOffset = new THREE.Vector3(-100, 0, 0);
 
 let gameField = null; // Element containing the renderer
 let isSimulationRunning = false; // This lets us control if the game loop is gonna call itself
-let curSimData = null; // Simulation data calculated by the backend
-let curStep = 0; // Current simulation step reached relative to the fixed time stamp
 let frameCounter = 0;
 
+// Simulation data
+let curSimData = null; // Simulation data calculated by the backend
+let curStep = 0; // Current simulation step reached relative to the fixed time stamp
+let xStep = 0;
+let yStep = 0;
+let timeStep = 0;
+let cannonLength = 0;
+let cannonAngle = 0;
 
 // Three.js objects
 let scene = null; 
 let camera = null; 
 let renderer = null; 
 let projectile = null;  // Projectile object
-
 
 
 function main() {
@@ -32,7 +39,7 @@ $(function() {
  */
 function setupGamefield() {
     scene = new THREE.Scene();
-    camera = new THREE.OrthographicCamera(0, gameField.width(), gameField.height(), 0, -1, 1);
+    camera = new THREE.OrthographicCamera(-10, gameField.width(), gameField.height(), -10, -1, 1);
 
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(gameField.width(), gameField.height());
@@ -42,17 +49,34 @@ function setupGamefield() {
 function startSimulation() {
     if (isSimulationRunning) return;
     if (curSimData == null || curSimData.length == 0) return;
+    
+    cleanScene()
 
-    // Creating projectile
-    const geometry = new THREE.PlaneGeometry(1 * METER_FACTOR, 1 * METER_FACTOR);
-    const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-    projectile = new THREE.Mesh(geometry, material);
+    camera.position.set(0, 0, 0)
+
+    // Creating ground
+    const geometryGround = new THREE.PlaneGeometry(10000000, 5 * METER_FACTOR);
+    const materialGround = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+    ground = new THREE.Mesh(geometryGround, materialGround);
+    ground.position.set(0, -10, 0);
+    scene.add(ground);
+
+    // Creating cannon
+    const geometryCannon = new THREE.PlaneGeometry(cannonLength * METER_FACTOR, 10);
+    const materialCannon = new THREE.MeshBasicMaterial( { color: 0x808080 } );
+    cannon = new THREE.Mesh(geometryCannon, materialCannon);
+    cannon.rotation.set(0, 0, 2*Math.PI*cannonAngle/360);
+    scene.add(cannon);
 
     //test d'un projectile créé avec une image
     // projectile = LoadTexture('https://threejsfundamentals.org/threejs/resources/images/wall.jpg', 200, 200);
     //test d'un projectile créé avec une image
 
-    projectile.position.set(1 * METER_FACTOR, 1 * METER_FACTOR, 0);
+    // Creating projectile
+    const geometry = new THREE.PlaneGeometry(5 * METER_FACTOR, 5 * METER_FACTOR,);
+    const material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
+    projectile = new THREE.Mesh(geometry, material);
+    projectile.position.set(0, 0, 0);
     scene.add(projectile);
     
     curStep = 0;
@@ -61,13 +85,14 @@ function startSimulation() {
     gameLoop(); // Start it (Its gonna call itself internally)
 }
 
-function stopSimulation() {
-    if (!isSimulationRunning) return;
-
+function cleanScene() {
     while(scene.children.length > 0) { 
         scene.remove(scene.children[0]); 
     }
+}
 
+function stopSimulation() {
+    cleanScene()
     isSimulationRunning = false; // Stop it, get some help
 }
 
@@ -77,8 +102,6 @@ function gameLoop() {
     // Scaling camera in case the window size changes
     if (renderer.width !== gameField.width() || renderer.height !== gameField.height()) {
         renderer.setSize(gameField.width(), gameField.height());
-        camera.aspect = gameField.width()/gameField.height();
-        camera.updateProjectionMatrix();
     }
 
     update();
@@ -90,21 +113,49 @@ function gameLoop() {
 
 function update() {
     // Every second, update position
-    if (frameCounter % 60 == 0) {
+    if (frameCounter % FPS == 0) {
         curStep++;
 
         // If no more data, stop the simulation
         if (curStep >= curSimData.length) {
-            stopSimulation();
+            isSimulationRunning = false;
             return;
         }
 
+        // Checking if there is a next step to plan some interpolation :)
         let stepData = curSimData[curStep];
+        let nextStepData = null;
+        if (curStep + 1 < curSimData.length) {
+            nextStepData = curSimData[curStep + 1];
+        }
+
         let x = stepData[0];
         let y = stepData[1];
 
+        // Linear interpolation between points
+        if (nextStepData != null) {
+            xStep = ((nextStepData[0] - x) / FPS) * METER_FACTOR;
+            yStep = ((nextStepData[1] - y) / FPS) * METER_FACTOR;
+        }
+        else {
+            xStep = 0;
+            yStep = 0;
+        }
+
+        // Setting exact position to avoid some float weirdness
         projectile.position.set(x * METER_FACTOR, y * METER_FACTOR, 0);
     }
+
+    if (projectile.position.y > (gameField.height() / 2)) {
+        camera.translateY(yStep);
+    }
+    if (projectile.position.x >= (gameField.width() / 2)) {
+        camera.translateX(xStep);
+    }
+
+    console.log(projectile.position.x + ", " + projectile.position.y);
+    projectile.position.x += xStep;
+    projectile.position.y += yStep;
 
     frameCounter++;
 }
@@ -155,21 +206,21 @@ function monke (params) {
     // Calculating simulation
     $.ajax({
         type: "POST",
-        url: document.location.href  + "/ajaxRunSimulation",
+        url: document.location.href  + "ajaxRunSimulation",
         data: JSON.stringify(params),
         contentType: "application/json; charset=utf-8",
         dataType: "json",
     }).done(function(e) {
         curSimData = e["data"];
-        if (curSimData == null || curSimData.length == 0) return; // Add something client side to show that it exploded
+        if (curSimData === null || curSimData.length == 0) return; // Add something client side to show that it exploded
     
+        cannonLength = parseFloat(params["length"]);
+        cannonAngle = parseFloat(params["angle"]);
         startSimulation();
     }).fail(function(e) {
         console.log(e);
     });
 };
-
-$("#start-sim").click(function() {monke({ "nbPoints": 6 })});
 
 $("#stop-sim").click(function() {
     stopSimulation();
@@ -180,6 +231,25 @@ $("#stop-sim").click(function() {
     isSimulationRunning = false;
 });
 
-$("#test").click(function() {
-    camera.translateX(1 * METER_FACTOR);
+$(document).keydown(function(event) {
+    var key = (event.keyCode ? event.keyCode : event.which);
+    const factor = 5;
+
+
+    if (key == 87) {
+        //UP
+        camera.translateY(factor * METER_FACTOR);
+    }
+    if (key == 65) {
+        //LEFT
+        camera.translateX(-factor * METER_FACTOR);
+    }
+    if (key == 83) {
+        //DOWN
+        camera.translateY(-factor * METER_FACTOR);
+    }
+    if (key == 68) {
+        //RIGHT
+        camera.translateX(factor * METER_FACTOR);
+    }
 });

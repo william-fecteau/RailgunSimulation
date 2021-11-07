@@ -1,4 +1,6 @@
 from flask import Flask, request
+import calcul
+import json
 
 app = Flask(__name__,
             static_url_path='', 
@@ -10,15 +12,13 @@ def hello_world():
 
 @app.route("/ajaxRunSimulation", methods=['POST'])
 def runSimulation():
-
     params = request.get_json()
-    print(params)
-    
-    nbPoints = params["nbPoints"]
 
-    allPositions = [(x,x) for x in range(nbPoints)]
-    print(allPositions)
+    result = calcul.Fire_Railgun(params)
+    
+    print(result)
+    
     return {
-        "data": allPositions
+        "data": result
     }
     

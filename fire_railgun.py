@@ -8,25 +8,34 @@ import math
 #retourner la serie de points 
 
 #tt ca devrait etre pull du dictionaire
-mass = 1
-volume =1
+mass = 1 / 1000
+volume = 100
 length = 5 
-angle = math.pi/18
-voltage = 10000
-resistance= 1 
-interspace = 0.1
+angl = math.pi/4
+voltage = 1000
+resistivity = 0.0001
+railradius = 10
+interspace = 0.001
+viscosity = 10**-8
+accel = -9.8
+
 points = 10
 timeStep = 0.2
 
 
 projectile = calcul.Projectile(mass,volume)
+projectile.acceleration = accel
 
-projectile.position.SetPolar(length,angle)
+projectile.position.SetPolar(length, angl)
 
-projectile.velocity.SetPolar(calcul.rail_gun(voltage, mass,resistance,length,interspace))
+projectile.velocity.SetPolar(calcul.Rail_Gun(voltage, mass, resistivity, length, interspace, railradius), angl)
 
-output = calcul.ArrayOutput(projectile,points, timeStep)
+output = calcul.ArrayOutputFriction(projectile, points, timeStep, viscosity)
 
+outpute = calcul.ArrayOutput(projectile, points, timeStep)
+
+for i in range(points):
+    print(output[i][2])
 
 
 #renvoyer output au front end pour affichage

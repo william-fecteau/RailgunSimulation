@@ -1,6 +1,7 @@
 :root {
-    --bg-menu: rgb(57, 63, 47);
+    --bg-menu: rgb(23, 50, 100);
     --bg-gamefield: rgb(15, 15, 15);
+    --label-font-color: rgb(255, 255, 255);
     --menu-height: 20%;
     --gamefield-height: calc(100% - var(--menu-height));
 }
@@ -44,16 +45,18 @@ body, html {
 
 .number-input {
     background-color:rgba(0,0,0,0);
+    color:blanchedalmond;
     border:none;
     width: 7ch;
 }
 
 .range {
     margin-left: 10px;
+    border-radius: 3px;
 }
 
 .div-form {
     display:inline-block;
-    color:firebrick;
+    color: var(--label-font-color);
     margin-right:5px;
 }
