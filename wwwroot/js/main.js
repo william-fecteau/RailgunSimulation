@@ -97,9 +97,13 @@ function cleanScene() {
 }
 
 function stopSimulation() {
-    scene.remove(projectile);
+    if (projectile != null) scene.remove(projectile);
+    projectile = null;
     isSimulationRunning = false; // Stop it, get some help
-    
+
+    updateCannonLength(cannonLength);
+    rotateCannon(cannonAngle);
+
     // Draw only one frame to get the cannon and the ground
     renderer.render(scene, camera);
 }
@@ -120,6 +124,8 @@ function gameLoop() {
 };
 
 function update() {
+    if (projectile == null) return;
+
     // Every second, update position
     if (frameCounter % FPS == 0) {
         curStep++;
@@ -204,7 +210,8 @@ function updateCannonLength(length) {
     if (!isSimulationRunning) {
         scene.remove(cannon);
         cannon = null;
-        
+
+        cannonLength = length;
         // Re-creating cannon with good lenght
         const geometryCannon = new THREE.PlaneGeometry(length * METER_FACTOR, 10);
         const materialCannon = new THREE.MeshBasicMaterial( { color: 0x808080 } );
@@ -243,6 +250,11 @@ function monke (params) {
     });
 };
 
+$("#stop-sim").click(function() {
+    stopSimulation();
+});
+
+/*
 $(document).keydown(function(event) {
     var key = (event.keyCode ? event.keyCode : event.which);
     const factor = 5;
@@ -265,3 +277,4 @@ $(document).keydown(function(event) {
         camera.translateX(factor * METER_FACTOR);
     }
 });
+*/

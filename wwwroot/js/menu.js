@@ -35,7 +35,6 @@ function updateTextInput(id , val) {
     document.getElementById(id).value=val;
 }
 
-
 function handleSubmit()
 {
     stopSimulation();
