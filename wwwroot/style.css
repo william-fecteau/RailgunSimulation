@@ -51,6 +51,7 @@ body, html {
 
 .range {
     margin-left: 10px;
+    border-radius: 3px;
 }
 
 .div-form {

@@ -1,4 +1,5 @@
 from flask import Flask, request
+import calcul
 
 app = Flask(__name__,
             static_url_path='', 
@@ -13,11 +14,7 @@ def runSimulation():
 
     params = request.get_json()
     print(params)
-    
-    nbPoints = params["nbPoints"]
 
-    allPositions = [(x,x) for x in range(nbPoints)]
-    print(allPositions)
     return {
         "data": allPositions
     }
