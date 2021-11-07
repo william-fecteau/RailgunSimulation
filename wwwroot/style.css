@@ -105,6 +105,8 @@ body, html {
 	color: red;
 	text-decoration: none;
 	transition: 0.3s ease-out;
+}
+
 #buttons {
     margin-top: 20px; 
     text-align: center;

@@ -195,7 +195,8 @@ function update() {
         camera.translateX(xStep);
     }
 
-    console.log(projectile.position.x + ", " + projectile.position.y);
+    $("#cur-pos").text("Current position : (" + Math.round(projectile.position.x, 2) + "," + Math.round(projectile.position.y, 2) + ")");
+
     projectile.position.x += xStep;
     projectile.position.y += yStep;
 
