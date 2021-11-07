@@ -7,6 +7,7 @@ let isSimulationRunning = false; // This lets us control if the game loop is gon
 let curSimData = null; // Simulation data calculated by the backend
 let curStep = 0; // Current simulation step reached relative to the fixed time stamp
 let frameCounter = 0;
+let heightToGround = 0;
 let xStep = 0;
 let yStep = 0;
 
@@ -87,7 +88,12 @@ function gameLoop() {
     // Scaling camera in case the window size changes
     if (renderer.width !== gameField.width() || renderer.height !== gameField.height()) {
         renderer.setSize(gameField.width(), gameField.height());
-        camera.aspect = gameField.width()/gameField.height();
+        heightToGround = gameField.height();
+    }
+
+    if(camera.position.y < heightToGround)
+    {
+        camera.position.set(projectile);
         camera.updateProjectionMatrix();
     }
 
