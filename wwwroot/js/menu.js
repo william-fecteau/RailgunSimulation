@@ -35,7 +35,7 @@ function updateTextInput(id , val) {
 
 function handleSubmit()
 {
-    monke({ "nbPoints": 6 });
+    monke({ "nbPoints": 12 });
 }
 
 function initializeMenu() {
