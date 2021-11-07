@@ -20,6 +20,7 @@ let scene = null;
 let camera = null; 
 let renderer = null; 
 let projectile = null;  // Projectile object
+let cannon = null;
 
 
 function main() {
@@ -43,30 +44,33 @@ function setupGamefield() {
 
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(gameField.width(), gameField.height());
-    gameField.append(renderer.domElement);
+    gameField.append(renderer.domElement); 
+
+    initScene();
 }
 
-function startSimulation() {
-    if (isSimulationRunning) return;
-    if (curSimData == null || curSimData.length == 0) return;
-    
-    cleanScene()
-
-    camera.position.set(0, 0, 0)
-
+function initScene() {
     // Creating ground
     const geometryGround = new THREE.PlaneGeometry(10000000, 5 * METER_FACTOR);
     const materialGround = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
     ground = new THREE.Mesh(geometryGround, materialGround);
     ground.position.set(0, -10, 0);
-    scene.add(ground);
+    scene.add(ground);   
 
-    // Creating cannon
-    const geometryCannon = new THREE.PlaneGeometry(cannonLength * METER_FACTOR, 10);
+    // Creating cannon with default values
+    const geometryCannon = new THREE.PlaneGeometry(50 * METER_FACTOR, 10);
     const materialCannon = new THREE.MeshBasicMaterial( { color: 0x808080 } );
     cannon = new THREE.Mesh(geometryCannon, materialCannon);
-    cannon.rotation.set(0, 0, 2*Math.PI*cannonAngle/360);
+    rotateCannon(45);
     scene.add(cannon);
+
+    // Draw only one frame to get the cannon and the ground
+    renderer.render(scene, camera);
+}
+
+function startSimulation() {
+    if (isSimulationRunning) return;
+    if (curSimData == null || curSimData.length == 0) return;
 
     //test d'un projectile créé avec une image
     // projectile = LoadTexture('https://threejsfundamentals.org/threejs/resources/images/wall.jpg', 200, 200);
@@ -86,14 +90,18 @@ function startSimulation() {
 }
 
 function cleanScene() {
+    camera.position.set(0, 0, 0)
     while(scene.children.length > 0) { 
         scene.remove(scene.children[0]); 
     }
 }
 
 function stopSimulation() {
-    cleanScene()
+    scene.remove(projectile);
     isSimulationRunning = false; // Stop it, get some help
+    
+    // Draw only one frame to get the cannon and the ground
+    renderer.render(scene, camera);
 }
 
 function gameLoop() {
@@ -142,12 +150,14 @@ function update() {
             yStep = 0;
         }
 
+
         // Setting exact position to avoid some float weirdness
         projectile.position.set(x * METER_FACTOR, y * METER_FACTOR, 0);
     }
 
     if (projectile.position.y > (gameField.height() / 2)) {
         camera.translateY(yStep);
+        if (camera.position.y < -10) camera.position.y = -10;
     }
     if (projectile.position.x >= (gameField.width() / 2)) {
         camera.translateX(xStep);
@@ -177,6 +187,30 @@ function LoadTexture(texture_name, width, height) {
     return plane;
 }
 
+function rotateCannon(angle) {
+    if (!isSimulationRunning) {
+        cannonAngle = angle;
+        cannon.rotation.set(0, 0, 2*Math.PI*angle/360);
+        // Draw only one frame to get the cannon and the ground
+        renderer.render(scene, camera);
+    }
+}
+
+function updateCannonLength(length) {
+    if (!isSimulationRunning) {
+        scene.remove(cannon);
+        cannon = null;
+        
+        // Re-creating cannon with good lenght
+        const geometryCannon = new THREE.PlaneGeometry(length * METER_FACTOR, 10);
+        const materialCannon = new THREE.MeshBasicMaterial( { color: 0x808080 } );
+        cannon = new THREE.Mesh(geometryCannon, materialCannon);
+        rotateCannon(45);
+        scene.add(cannon);
+
+        renderer.render(scene, camera);
+    }
+}
 
 /*
 ======================================
@@ -204,15 +238,6 @@ function monke (params) {
         console.log(e);
     });
 };
-
-$("#stop-sim").click(function() {
-    stopSimulation();
-
-    // Make one iteration just to get a black screen
-    isSimulationRunning = true;
-    gameLoop();
-    isSimulationRunning = false;
-});
 
 $(document).keydown(function(event) {
     var key = (event.keyCode ? event.keyCode : event.which);

@@ -32,12 +32,14 @@ let PARAMS = {
 
 
 function updateTextInput(id , val) {
-    document.getElementById(id).value=val; 
+    document.getElementById(id).value=val;
 }
 
 
 function handleSubmit()
 {
+    stopSimulation();
+
     let params = {};
     const formData = new FormData(document.querySelector('form'))
     for (var pair of formData.entries()) {
@@ -78,7 +80,12 @@ function initializeMenu() {
                     max: PARAMS[prop][1],
                     step: PARAMS[prop][2],
                     value: PARAMS[prop][3]
-                }).on("input", (event) => (updateTextInput(`${prop}-counter`, event.target.value)));
+                }).on("input", (event) => {
+                    updateTextInput(`${prop}-counter`, event.target.value)
+
+                    if (prop == 'angle') rotateCannon(parseFloat($("#angle-counter").val()));
+                    if (prop == 'length') updateCannonLength(parseFloat($("#length-counter").val()));
+                });
             div.append(range);
             div.append( // counter
                 $('<input>', {
@@ -98,7 +105,7 @@ function initializeMenu() {
 
 
 function menu() {
-    initializeMenu()
+    initializeMenu();
 }
 
 $(function() {
