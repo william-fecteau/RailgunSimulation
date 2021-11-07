@@ -19,6 +19,6 @@ def runSimulation():
     allPositions = [(x,x) for x in range(nbPoints)]
     print(allPositions)
     return {
-        "positions": allPositions
+        "data": allPositions
     }
     
