@@ -161,7 +161,7 @@ def Fire_Railgun(array):
     mass =          float(array['mass'])
     volume =        float(array['volume'])
     length =        float(array['length'])
-    voltage =       float(array['voltage'])
+    voltage =       10**float(array['voltage'])
     interspace =    float(array['interspace'])
     angl =          float(array['angle'])
     railradius =    float(array['radius'])

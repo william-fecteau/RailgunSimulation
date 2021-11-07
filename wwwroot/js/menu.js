@@ -2,7 +2,7 @@ let PARAMS = {
     mass      : [1, 100],
     volume    : [1, 100], 
     length    : [1, 100],
-    voltage   : [1, 10000],
+    voltage   : [0.01, 10],
     interspace: [0.001, 10],
     angle     : [0,90],
     radius    : [0.1, 100],
