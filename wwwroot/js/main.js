@@ -68,9 +68,9 @@ function startSimulation() {
     cannon.rotation.set(0, 0, 2*Math.PI*cannonAngle/360);
     scene.add(cannon);
 
-    //test d'un projectile créé avec une image
-    // projectile = LoadTexture('https://threejsfundamentals.org/threejs/resources/images/wall.jpg', 200, 200);
-    //test d'un projectile créé avec une image
+    // test d'un projectile créé avec une image
+    projectile = LoadTexture('https://drive.google.com/file/d/1Z4thKO_UTKE9_iwdITLFH1ERGumSnbCH/view?usp=sharing', 200, 200);
+    // test d'un projectile créé avec une image
 
     // Creating projectile
     const geometry = new THREE.PlaneGeometry(5 * METER_FACTOR, 5 * METER_FACTOR,);
@@ -158,6 +158,10 @@ function update() {
     projectile.position.y += yStep;
 
     frameCounter++;
+}
+
+function MoveCamera(x, y) {
+    camera.position.set(x, y, camera.position.z);
 }
 
 // Map a texture to a plane.
