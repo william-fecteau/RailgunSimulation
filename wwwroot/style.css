@@ -2,7 +2,7 @@
     --bg-menu: rgb(23, 50, 100);
     --bg-gamefield: rgb(15, 15, 15);
     --label-font-color: rgb(255, 255, 255);
-    --menu-height: 20%;
+    --menu-height: 25%;
     --gamefield-height: calc(100% - var(--menu-height));
 }
 
@@ -64,4 +64,9 @@ body, html {
 #buttons {
     margin-top: 20px; 
     text-align: center;
+}
+
+#sim-score {
+    text-align: center;
+    color: white;
 }
