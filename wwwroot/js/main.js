@@ -54,7 +54,7 @@ function setupGamefield() {
 function initScene() {    
     // Creating ground
     const geometryGround = new THREE.PlaneGeometry(1000000000, 5 * METER_FACTOR);
-    const materialGround = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+    const materialGround = new THREE.MeshBasicMaterial( { color: "#FFD966" } );
     ground = new THREE.Mesh(geometryGround, materialGround);
     ground.position.set(0, -10, 0);
     scene.add(ground);   
@@ -80,9 +80,9 @@ function setBg (urlSkybox, urlBgTexture, callback)
             bgTexture.magFilter = THREE.LinearFilter;
             bgTexture.wrapS = THREE.RepeatWrapping;
             bgTexture.repeat.set(100,1);
-            const matBg = new THREE.MeshBasicMaterial( { map: bgTexture} );
+            const matBg = new THREE.MeshBasicMaterial( { map: bgTexture, transparent: true} );
             let background = new THREE.Mesh(geoBg, matBg);
-            background.position.set(-50, 0 , 0);
+            background.position.set(-50, bgTexture.image.height /2, 0);
             background.renderOrder = -9999;
             scene.add(background);
             scene.background = skybox;
