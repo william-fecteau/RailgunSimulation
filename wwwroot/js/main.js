@@ -126,6 +126,23 @@ function LoadTexture(texture_name, width, height) {
     return plane;
 }
 
+function Extrapolate(initial_position, final_position, number_of_intermediate_positions) {
+    let delta_y = (final_position.y - initial_position.y) / number_of_intermediate_positions;
+    let delta_x = (final_position.x - initial_position.x) / number_of_intermediate_positions;
+
+    let filledArray = new Array(number_of_intermediate_positions);
+    for (let i = 0; i < number_of_intermediate_positions; i++) {
+        initial_position.y += delta_y;
+        initial_position.x += delta_x;
+        filledArray[i] = initial_position;
+    }
+    return filledArray;
+}
+
+function PlaySound(filename) {
+    var audio = new Audio(filename);
+    audio.play();
+}
 
 /*
 ======================================
