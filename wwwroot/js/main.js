@@ -110,7 +110,7 @@ function startSimulation() {
 
     // Creating projectile
     const geometry = new THREE.PlaneGeometry(20 * METER_FACTOR, 20 * METER_FACTOR,);
-    let monkey = new THREE.TextureLoader().load("/images/monke.png", (monke) => {
+    let monkey = new THREE.TextureLoader().load("/Images/monke.png", (monke) => {
         const material = new THREE.MeshBasicMaterial( { map: monke, transparent: true} );
         projectile = new THREE.Mesh(geometry, material);
         projectile.position.set(0, 0, 0);
