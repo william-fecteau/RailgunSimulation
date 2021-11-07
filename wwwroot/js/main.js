@@ -170,6 +170,10 @@ function update() {
     frameCounter++;
 }
 
+function MoveCamera(x, y) {
+    camera.position.set(x, y, camera.position.z);
+}
+
 // Map a texture to a plane.
 // texture_name : path of the texture
 // width : width of the plane
