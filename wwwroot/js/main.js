@@ -107,7 +107,7 @@ function startSimulation() {
     //test d'un projectile créé avec une image
 
     // Creating projectile
-    const geometry = new THREE.PlaneGeometry(10 * METER_FACTOR, 10 * METER_FACTOR,);
+    const geometry = new THREE.PlaneGeometry(20 * METER_FACTOR, 20 * METER_FACTOR,);
     let monkey = new THREE.TextureLoader().load("/images/monke.png", (monke) => {
         const material = new THREE.MeshBasicMaterial( { map: monke, transparent: true} );
         projectile = new THREE.Mesh(geometry, material);
