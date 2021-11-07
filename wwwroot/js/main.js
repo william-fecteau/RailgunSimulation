@@ -35,7 +35,7 @@ $(function() {
  */
 function setupGamefield() {
     scene = new THREE.Scene();
-    camera = new THREE.OrthographicCamera(0, gameField.width(), gameField.height(), 0, -1, 1);
+    camera = new THREE.OrthographicCamera(0, gameField.width(), gameField.height(), -10, -1, 1);
 
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(gameField.width(), gameField.height());
@@ -46,9 +46,16 @@ function startSimulation() {
     if (isSimulationRunning) return;
     if (curSimData == null || curSimData.length == 0) return;
 
+    // Creating ground
+    const geometryGround = new THREE.PlaneGeometry(100000, 100);
+    const materialGround = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+    ground = new THREE.Mesh(geometryGround, materialGround);
+    ground.position.set(0, -10, 0);
+    scene.add(ground);
+
     // Creating projectile
     const geometry = new THREE.PlaneGeometry(1 * METER_FACTOR, 1 * METER_FACTOR);
-    const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+    const material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
     projectile = new THREE.Mesh(geometry, material);
 
     //test d'un projectile créé avec une image
@@ -102,6 +109,7 @@ function update() {
             return;
         }
 
+        // Checking if there is a next step to plan some interpolation :)
         let stepData = curSimData[curStep];
         let nextStepData = null;
         if (curStep + 1 < curSimData.length) {
@@ -111,6 +119,7 @@ function update() {
         let x = stepData[0];
         let y = stepData[1];
 
+        // Linear interpolation between points
         if (nextStepData != null) {
             xStep = ((nextStepData[0] - x) / FPS) * METER_FACTOR;
             yStep = ((nextStepData[1] - y) / FPS) * METER_FACTOR;
@@ -120,6 +129,7 @@ function update() {
             yStep = 0;
         }
 
+        // Setting exact position to avoid some float weirdness
         projectile.position.set(x * METER_FACTOR, y * METER_FACTOR, 0);
     }
 
