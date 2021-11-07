@@ -80,7 +80,7 @@ function initializeMenu() {
             div.append( // counter
                 $('<input>', {
                     class : "number-input",
-                    type: "number",
+                    type: "text",
                     id: `${prop}-counter`
                 })
             );
