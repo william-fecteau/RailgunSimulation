@@ -29,14 +29,12 @@ class Vector:
         print("Component: \n X: ", self.x, " \n Y: ", self.y, "\n\n Hypothenuse: ", self.hyp, "\n Angle(rad): ", self.angle )
 
 
-
-
 class Projectile:
     def __init__(self,mass,volume):
         self.mass = mass
         self.velocity = Vector(0,0)
         self.position = Vector(0,0)
-        self.acceleration = Vector(0,0)
+        self.acceleration = 0
         self.volume = volume
 
 
@@ -46,9 +44,6 @@ class Projectile:
 
     def SetPosition(self,position):
         self.position = position
-
-    def SetAcceleration(self, acceleration):
-        self.acceleration = acceleration
     #position
     #masse
     #velocite
@@ -82,26 +77,17 @@ class Cible:
         if(Py+radius >= self.lowerBound and Py-radius <= self.upperBound):
             return True
         return False
-
-
-    
-
-
-
-
-    
+  
 
 #fonctions de calcul ---------------------------------------------------------
-
-def rail_gun(voltage, mass, resistivity, length, interspace, railradius):
-    resistance = (resistivity * 2 * length) / (((railradius / 1000)^2) * math.pi)
+def Rail_Gun(voltage, mass, resistivity, length, interspace, railradius):
+    resistance = (resistivity * 2 * length) / (((railradius / 1000)**2) * math.pi) #candidat 2 
     intensity = voltage / resistance
     field = ((4 * math.pi * 10**-7) * intensity) / ( math.pi * (interspace / 2))
     force = intensity * field * interspace
     acc = force / mass
     speed = math.sqrt(2 * acc * length)
     return speed
-
 
 
 #return un array d'array de 4 composantes
@@ -112,13 +98,13 @@ def ArrayOutput(projectile, points, timeStep):
         time = i*timeStep
 
         #calcul de la velocity 
-        Vx = projectile.velocity.x + projectile.acceleration.x *time
-        Vy = projectile.velocity.y + projectile.acceleration.y *time
+        Vx = projectile.velocity.x
+        Vy = projectile.velocity.y + projectile.acceleration *time
 
 
-        Px = projectile.velocity.x *time +projectile.position.x + (projectile.acceleration.y/2)*(time**2)
+        Px = projectile.velocity.x *time +projectile.position.x
         #calcul de la position
-        Py = max(0,projectile.velocity.y *time + (projectile.acceleration.y/2)*(time**2) + projectile.position.y)
+        Py = max(0,projectile.velocity.y *time + (projectile.acceleration/2)*(time**2) + projectile.position.y)
         if(Py == 0): #impact avec le sol, le mouvement s'arrete
             output.append((Px,Py,Vx,Vy))
             return(output)
@@ -137,21 +123,22 @@ def ArrayOutputFriction(projectile, points, timeStep, viscosity):
 
         #calcul de la velocity
 
+        #candidat 1
         friction = 6 * math.pi * viscosity * ((projectile.volume / 4 * math.pi)**(1/3))
-
+        
         c = projectile.mass * projectile.velocity.x/friction
         Vx = (c*friction/projectile.mass)*math.exp(-friction*time/projectile.mass)
 
 
-        c = projectile.acceleration.y * projectile.mass/friction
+        c = projectile.acceleration * projectile.mass/friction
         Vy = c + (projectile.velocity.y - c)*(math.exp(-friction*time/projectile.mass))
         
 
 
 
         #calcul de la position
-        c1 = projectile.acceleration.y*projectile.mass/friction
-        c2 = (projectile.mass/friction)*(projectile.velocity.y - projectile.acceleration.y*projectile.mass/friction)
+        c1 = projectile.acceleration*projectile.mass/friction
+        c2 = (projectile.mass/friction)*(projectile.velocity.y - projectile.acceleration*projectile.mass/friction)
         Py = max(0,c1*time + c2*(1-math.exp(-friction*time/projectile.mass)) +projectile.position.y)
 
 
@@ -168,6 +155,3 @@ def ArrayOutputFriction(projectile, points, timeStep, viscosity):
         compteur +=1
         output.append((Px,Py,Vx,Vy))
     return(output)
-
-
-

@@ -1,10 +1,14 @@
 const METER_FACTOR = 50;
+const TIME_STEP = 0.2;
+const FPS = 60;
 
 let gameField = null; // Element containing the renderer
 let isSimulationRunning = false; // This lets us control if the game loop is gonna call itself
 let curSimData = null; // Simulation data calculated by the backend
 let curStep = 0; // Current simulation step reached relative to the fixed time stamp
 let frameCounter = 0;
+let xStep = 0;
+let yStep = 0;
 
 
 // Three.js objects
@@ -12,7 +16,6 @@ let scene = null;
 let camera = null; 
 let renderer = null; 
 let projectile = null;  // Projectile object
-
 
 
 function main() {
@@ -32,7 +35,7 @@ $(function() {
  */
 function setupGamefield() {
     scene = new THREE.Scene();
-    camera = new THREE.OrthographicCamera(0, gameField.width(), gameField.height(), 0, -1, 1);
+    camera = new THREE.OrthographicCamera(0, gameField.width(), gameField.height(), -10, -1, 1);
 
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(gameField.width(), gameField.height());
@@ -43,9 +46,16 @@ function startSimulation() {
     if (isSimulationRunning) return;
     if (curSimData == null || curSimData.length == 0) return;
 
+    // Creating ground
+    const geometryGround = new THREE.PlaneGeometry(100000, 100);
+    const materialGround = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+    ground = new THREE.Mesh(geometryGround, materialGround);
+    ground.position.set(0, -10, 0);
+    scene.add(ground);
+
     // Creating projectile
     const geometry = new THREE.PlaneGeometry(1 * METER_FACTOR, 1 * METER_FACTOR);
-    const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+    const material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
     projectile = new THREE.Mesh(geometry, material);
 
     //test d'un projectile créé avec une image
@@ -90,7 +100,7 @@ function gameLoop() {
 
 function update() {
     // Every second, update position
-    if (frameCounter % 60 == 0) {
+    if (frameCounter % FPS == 0) {
         curStep++;
 
         // If no more data, stop the simulation
@@ -99,12 +109,32 @@ function update() {
             return;
         }
 
+        // Checking if there is a next step to plan some interpolation :)
         let stepData = curSimData[curStep];
+        let nextStepData = null;
+        if (curStep + 1 < curSimData.length) {
+            nextStepData = curSimData[curStep + 1];
+        }
+
         let x = stepData[0];
         let y = stepData[1];
 
+        // Linear interpolation between points
+        if (nextStepData != null) {
+            xStep = ((nextStepData[0] - x) / FPS) * METER_FACTOR;
+            yStep = ((nextStepData[1] - y) / FPS) * METER_FACTOR;
+        }
+        else {
+            xStep = 0;
+            yStep = 0;
+        }
+
+        // Setting exact position to avoid some float weirdness
         projectile.position.set(x * METER_FACTOR, y * METER_FACTOR, 0);
     }
+
+    projectile.position.x += xStep;
+    projectile.position.y += yStep;
 
     frameCounter++;
 }
@@ -151,8 +181,6 @@ function monke (params) {
         console.log(e);
     });
 };
-
-$("#start-sim").click(function() {monke({ "nbPoints": 6 })});
 
 $("#stop-sim").click(function() {
     stopSimulation();
