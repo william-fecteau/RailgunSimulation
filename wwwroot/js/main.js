@@ -8,6 +8,7 @@ const cameraOffset = new THREE.Vector3(-100, 0, 0);
 let gameField = null; // Element containing the renderer
 let isSimulationRunning = false; // This lets us control if the game loop is gonna call itself
 let frameCounter = 0;
+let waitingForBgLoad = false;
 
 // Simulation data
 let curSimData = null; // Simulation data calculated by the backend
@@ -83,6 +84,7 @@ function setBg (urlBgTexture, urlSkybox, callback)
             
             // Draw only one frame to get the cannon and the ground
             renderer.render(scene, camera);
+            waitingForBgLoad = false;
 
             if(callback){
                 callback();
@@ -96,6 +98,9 @@ function setBg (urlBgTexture, urlSkybox, callback)
 
 function startSimulation() {
     if (isSimulationRunning) return;
+    if(waitingForBgLoad){
+        changePlanet();
+    }
     if (curSimData === null || curSimData.length === 0) return;
 
     camera.position.set(0, 0, 0);
@@ -119,6 +124,24 @@ function startSimulation() {
 
 }
 
+function changePlanet() {
+    if (isSimulationRunning) {
+        waitingForBgLoad = true;
+    }
+    let planet = {
+        earth: ["Images/foreground-earth.png", "Images/skybox-earth.png"],
+        mercury: ["Images/foreground-mercury.png", "Images/skybox-mercury.png"],
+        moon: ["Images/foreground-moon.png", "Images/skybox-moon.png"],
+        jupiter: ["Images/foreground-jupiter.png", "Images/skybox-jupiter.png"],
+        sun: ["Images/foreground-sun.png", "Images/skybox-sun.png"],
+        titan: ["Images/foreground-titan.png", "Images/skybox-titan.png"]
+    };
+    setBg(
+        planet[$("#planet option:selected").text()][0], 
+        planet[$("#planet option:selected").text()][1]
+        );
+}
+
 
 function stopSimulation() {
     if (projectile !== null) scene.remove(projectile);
@@ -130,6 +153,9 @@ function stopSimulation() {
 
     // Draw only one frame to get the cannon and the ground
     renderer.render(scene, camera);
+    if(waitingForBgLoad){
+        changePlanet();
+    }
 }
 
 function gameLoop() {
@@ -197,6 +223,7 @@ function update() {
 
     projectile.position.x += xStep;
     projectile.position.y += yStep;
+    projectile.rotation.z = projectile.rotation.z + 0.1;
 
     frameCounter++;
 }

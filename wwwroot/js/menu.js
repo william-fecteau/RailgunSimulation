@@ -1,4 +1,4 @@
-/*global $, monke, stopSimulation, rotateCannon, updateCannonLength*/
+/*global $, monke, stopSimulation, rotateCannon, updateCannonLength, setBg*/
 /*jshint sub:true*/
  /*jshint unused:false*/
 let PARAMS = {
@@ -103,27 +103,13 @@ function initializeMenu() {
         }
         $('#controlers').append(div);
     }
-};
+}
 
 
 function menu() {
     initializeMenu();
     $("#planet-controler").val(PARAMS.planet.mercury);
-    $("#planet-controler").on("change", (event)=>{
-        let planet = {
-            earth: ["Images/foreground-earth.png", "Images/skybox-earth.png"],
-            mercury: ["Images/foreground-mercury.png", "Images/skybox-mercury.png"],
-            moon: ["Images/foreground-moon.png", "Images/skybox-moon.png"],
-            jupiter: ["Images/foreground-jupiter.png", "Images/skybox-jupiter.png"],
-            sun: ["Images/foreground-sun.png", "Images/skybox-sun.png"],
-            moon: ["Images/foreground-moon.png", "Images/skybox-moon.png"],
-            titan: ["Images/foreground-titan.png", "Images/skybox-titan.png"]
-        }
-        setBg(
-            planet[$("#planet option:selected").text()][0], 
-            planet[$("#planet option:selected").text()][1]
-            );
-    });
+    $("#planet-controler").on("change", () => {changePlanet();});
 }
 
 $(function() {
