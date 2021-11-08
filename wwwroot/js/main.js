@@ -1,3 +1,6 @@
+/*global THREE, $ */
+/*jshint sub:true*/
+/*jshint unused:false*/
 const METER_FACTOR = 2;
 const FPS = 10;
 const cameraOffset = new THREE.Vector3(-100, 0, 0);
@@ -23,17 +26,7 @@ let renderer = null;
 let projectile = null;  // Projectile object
 let cannon = null;
 let background = null;
-
-
-function main() {
-    gameField = $("#gamefield");
-    setupGamefield();
-}
-
-$(function() {
-    main();
-});
-
+let ground = null;
 
 /*
 ======================================
@@ -63,21 +56,20 @@ function initScene() {
     const geometryCannon = new THREE.PlaneGeometry(50 * METER_FACTOR, 10);
     const materialCannon = new THREE.MeshBasicMaterial( { color: 0x808080 } );
     cannon = new THREE.Mesh(geometryCannon, materialCannon);
-    cannon.renderOrder = 99999;
     rotateCannon(45);
     scene.add(cannon);
 
     // set bg + render once
     setBg('/Images/foreground-mercury.png', '/Images/skybox-mercury.png',
-            () => {scene.render(scene, camera)}
+            () => {renderer.render(scene, camera);}
         );
 }
 
 function setBg (urlBgTexture, urlSkybox, callback)
 {
     if (isSimulationRunning) return;
-    bgTexture = new THREE.TextureLoader().load(urlBgTexture, function (bgTexture) {
-        skyBox = new THREE.TextureLoader().load(urlSkybox, function (skybox) {
+    new THREE.TextureLoader().load(urlBgTexture, function (bgTexture) {
+        new THREE.TextureLoader().load(urlSkybox, function (skybox) {
             let geoBg = new THREE.PlaneGeometry(bgTexture.image.width*100, bgTexture.image.height);
             bgTexture.magFilter = THREE.LinearFilter;
             bgTexture.wrapS = THREE.RepeatWrapping;
@@ -91,7 +83,11 @@ function setBg (urlBgTexture, urlSkybox, callback)
             
             // Draw only one frame to get the cannon and the ground
             renderer.render(scene, camera);
-        })
+
+            if(callback){
+                callback();
+            }
+        });
     });
 
     // Draw only one frame to get the cannon and the ground
@@ -100,7 +96,7 @@ function setBg (urlBgTexture, urlSkybox, callback)
 
 function startSimulation() {
     if (isSimulationRunning) return;
-    if (curSimData == null || curSimData.length == 0) return;
+    if (curSimData === null || curSimData.length === 0) return;
 
     camera.position.set(0, 0, 0);
 
@@ -109,8 +105,8 @@ function startSimulation() {
     //test d'un projectile créé avec une image
 
     // Creating projectile
-    const geometry = new THREE.PlaneGeometry(20 * METER_FACTOR, 20 * METER_FACTOR,);
-    let monkey = new THREE.TextureLoader().load("/Images/monke.png", (monke) => {
+    const geometry = new THREE.PlaneGeometry(20 * METER_FACTOR, 20 * METER_FACTOR);
+    new THREE.TextureLoader().load("/Images/monke.png", (monke) => {
         const material = new THREE.MeshBasicMaterial( { map: monke, transparent: true} );
         projectile = new THREE.Mesh(geometry, material);
         projectile.position.set(0, 0, 0);
@@ -125,7 +121,7 @@ function startSimulation() {
 
 
 function stopSimulation() {
-    if (projectile != null) scene.remove(projectile);
+    if (projectile !== null) scene.remove(projectile);
     projectile = null;
     isSimulationRunning = false; // Stop it, get some help
 
@@ -149,13 +145,13 @@ function gameLoop() {
     renderer.render(scene, camera);
 
     requestAnimationFrame(gameLoop);
-};
+}
 
 function update() {
-    if (projectile == null) return;
+    if (projectile === null) return;
 
     // Every second, update position
-    if (frameCounter % FPS == 0) {
+    if (frameCounter % FPS === 0) {
         curStep++;
 
         // If no more data, stop the simulation
@@ -175,7 +171,7 @@ function update() {
         let y = stepData[1];
 
         // Linear interpolation between points
-        if (nextStepData != null) {
+        if (nextStepData !== null) {
             xStep = ((nextStepData[0] - x) / FPS) * METER_FACTOR;
             yStep = ((nextStepData[1] - y) / FPS) * METER_FACTOR;
         }
@@ -237,7 +233,7 @@ function rotateCannon(angle) {
 }
 
 function updateCannonLength(length) {
-    if (length != 0) {
+    if (length !== 0) {
         scene.remove(cannon);
         cannon = null;
 
@@ -270,9 +266,9 @@ function monke (params) {
         dataType: "json",
     }).done(function(e) {
         curSimData = e["data"];
-        if (curSimData === null || curSimData.length == 0) return; // Add something client side to show that it exploded
+        if (curSimData === null || curSimData.length === 0) return; // Add something client side to show that it exploded
     
-        lastPoint = curSimData[curSimData.length - 1];
+        let lastPoint = curSimData[curSimData.length - 1];
         score = lastPoint[0];
         $("#sim-score").text("This simulation score : " + score + " m");
 
@@ -282,7 +278,7 @@ function monke (params) {
     }).fail(function(e) {
         console.log(e);
     });
-};
+}
 
 $("#stop-sim").click(function() {
     stopSimulation();
@@ -312,3 +308,12 @@ $(document).keydown(function(event) {
     }
 });
 */
+
+function main() {
+    gameField = $("#gamefield");
+    setupGamefield();
+}
+
+$(function() {
+    main();
+});

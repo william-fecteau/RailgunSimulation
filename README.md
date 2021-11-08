@@ -10,7 +10,7 @@ pip install poetry
 ```cmd
 poetry install
 ```
-3. Run the web app
+3. Run the web app with hot reload active
 ```cmd
-poetry run flask run
+poetry run flask run --reload --debugger
 ```

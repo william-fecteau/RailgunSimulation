@@ -21,15 +21,15 @@
         <menu id="menu" class="sections">
             <form id="send-form" action="javascript:handleSubmit()">
                 <div id="controlers"></div>
-                <div id="buttons">
-                    <input id="submit-btn" value="Start simulation" class="btn btn-warning" type="submit" />
-                    <button id="stop-sim" type="button" class="btn btn-danger">Stop simulation</button> 
-                </div>
-                <div id="sim-score">
-
-                </div>
-                <div id="cur-pos">
-
+                <div class="lower-menu"> 
+                    <div class="buttons">
+                        <input id="submit-btn" value="Start simulation" class="btn btn-warning" type="submit" />
+                        <button id="stop-sim" style="margin-left:5px;" type="button" class="btn btn-danger">Stop simulation</button> 
+                    </div>
+                    <div class="scoring">
+                        <div id="sim-score">This simulation score : XXXXXXXXXXXXXXX m</div><br>
+                        <div id="cur-pos">Current position : (XXX,XXX)</div>
+                    </div>
                 </div>
             </form>
         </menu>
@@ -37,15 +37,11 @@
             <!-- Simulation goes here -->
         </div>
         <div class="footer-container">
-            <div class="footer">
-                <div class="footer-heading footer-1">
                     <h2>About Us</h2>
-                        <a href="/doc" target="_blank">Physics used for the simulation</a>
-                        <a href="https://github.com/AggroBane/RailgunSimulation" target="_blank">Our GitHub</a>
-                        <a href="https://devpost.com/software/railgun-simulation", target="_blank">Our DevPost</a>
-                        <h3>@2021 🐒 Sigma Monkeys 🐒</h3>
-                </div>
-            </div>
+                    <a href="/doc" target="_blank">Physics used for the simulation</a> |
+                    <a href="https://github.com/AggroBane/RailgunSimulation" target="_blank">Our GitHub</a> |
+                    <a href="https://devpost.com/software/railgun-simulation", target="_blank">Our DevPost</a>
+                    <h3>@2021 🐒 Sigma Monkeys 🐒</h3>
         </div>
     </main>
 </body>

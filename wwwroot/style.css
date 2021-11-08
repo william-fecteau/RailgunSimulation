@@ -1,9 +1,12 @@
 :root {
     --bg-menu: rgb(23, 50, 100);
     --bg-gamefield: rgb(15, 15, 15);
+    --bg-main: rgb(27, 27, 27);
     --label-font-color: rgb(255, 255, 255);
-    --menu-height: 25%;
-    --gamefield-height: calc(75% - var(--menu-height));
+    --footer-h2: rgb(131, 141, 151);
+    --menu-height: 30%;
+    --footer-height: 5%;
+    --gamefield-height: calc(100% - var(--menu-height) - var(--footer-height));
 }
 
 body, html {
@@ -23,24 +26,36 @@ body, html {
     flex-direction: column;
     width:100%;
     height:100%;
-    background-color: rgb(27, 27, 27);
+    background-color: var(--bg-main)
 }
 
 #menu {
-    height: var(--menu-height);
     background-color: var(--bg-menu);
+    flex: 0 1 auto;
 }
 
 #gamefield {
     --margin: 1.5%;
-    margin: var(--margin) var(--margin) var(--margin) var(--margin);
+    margin: var(--margin) var(--margin) 0 var(--margin);
     width: calc(100% - 2*var(--margin));
-    height: calc(var(--gamefield-height) - 2*var(--margin));
+    flex: 2 1 auto;
     background-color: var(--bg-gamefield);
 }
 
 #send-form {
-    padding:2%;
+    padding:1.5%;
+}
+
+.lower-menu {
+    margin-top:20px;
+    display:flex;
+    justify-content: center;
+}
+
+#controlers {
+    display:flex;
+    flex-wrap: wrap;
+    justify-content:space-evenly;
 }
 
 .number-input {
@@ -63,56 +78,59 @@ body, html {
 
 
 .footer-container {
-	background-color: #212329;
+	background-color: var(--bg-main);
 	padding-top: 1rem;
+    flex: 0 1;
+    color: var(--footer-h2);
+    padding: 1.5%;
+    text-align: center;
 }
 
 .footer {
     font-family: Arial;
-	width: 80%;
-	height: 10%;
 	background-color: #212329;
 	color: #fff;
-	display: flex;
-	justify-content: center;
-	flex-wrap: wrap;
 	margin: 0 auto;
+    flex: 1 4 auto;
 }
 
-.footer-heading {
-	display: flex;
-	flex-direction: column;
-	margin-right: 4rem;
-}
-
-.footer-heading h2 {
+.footer-container h2 {
+    color: var(--footer-h2);
     font-size: 1.5rem;
-	margin-bottom: 0.5rem;
+	margin-bottom: 0;
 }
 
-.footer-heading h3 {
-	font-size: 0.75rem;
+.footer-container h3 {
+	font-size: 1rem;
     color: rgba(141, 163, 184, 0.344);
+    margin: 0.5rem;
 }
 
-.footer-heading a {
+.footer-container a {
 	color: #fff;
 	text-decoration: none;
 	margin-bottom:0.5rem;
 }
 
-.footer-heading a:hover {
+.footer-container a:hover {
 	color: red;
 	text-decoration: none;
 	transition: 0.3s ease-out;
 }
 
-#buttons {
-    margin-top: 20px; 
+.buttons {
+    margin-right: 20px; 
     text-align: center;
 }
 
-#sim-score, #cur-pos {
-    text-align: center;
+.scoring
+{
+    display:inline-block;
+    text-align: left;
     color: white;
+}
+
+#sim-score, #cur-pos {
+    display:inline-block;
+
 }

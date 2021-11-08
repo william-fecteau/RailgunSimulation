@@ -1,3 +1,6 @@
+/*global $, monke, stopSimulation, rotateCannon, updateCannonLength*/
+/*jshint sub:true*/
+ /*jshint unused:false*/
 let PARAMS = {
     //          min,    max,    step    default 
     mass      : [1,     100,    1,      20],
@@ -28,7 +31,7 @@ let PARAMS = {
         gazoline: (2.92 * (10** -4)),
         meg: (2.14 * (10** -2))
     }
-}
+};
 
 
 function updateTextInput(id , val) {
@@ -55,7 +58,7 @@ function initializeMenu() {
                 for: `${prop}-controler`
             })
         );
-        if(PARAMS[prop].constructor == Object) { 
+        if(PARAMS[prop].constructor === Object) { 
             let select = $('<select>', {
                     class : "range",
                     id: `${prop}-controler`,
@@ -82,8 +85,8 @@ function initializeMenu() {
                 }).on("input", (event) => {
                     updateTextInput(`${prop}-counter`, event.target.value)
 
-                    if (prop == 'angle') rotateCannon(parseFloat($("#angle-counter").val()));
-                    if (prop == 'length') updateCannonLength(parseFloat($("#length-counter").val()));
+                    if (prop === 'angle') rotateCannon(parseFloat($("#angle-counter").val()));
+                    if (prop === 'length') updateCannonLength(parseFloat($("#length-counter").val()));
                 });
             div.append(range);
             div.append( // counter
