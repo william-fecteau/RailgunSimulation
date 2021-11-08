@@ -223,7 +223,7 @@ function update() {
 
     projectile.position.x += xStep;
     projectile.position.y += yStep;
-    projectile.rotation.z = projectile.rotation.z + 0.1;
+    if(projectile.position.y > 0) projectile.rotation.z = projectile.rotation.z + 0.1;
 
     frameCounter++;
 }
