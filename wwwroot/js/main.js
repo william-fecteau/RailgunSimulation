@@ -274,7 +274,7 @@ function monke (params) {
     
         lastPoint = curSimData[curSimData.length - 1];
         score = lastPoint[0];
-        $("#sim-score").text("This simulation score : " + score + " m");
+        $("#sim-score").text("This simulation score : " + score.toLocaleString('en-US', {score:0}) + " m");
 
         cannonLength = parseFloat(params["length"]);
         cannonAngle = parseFloat(params["angle"]);
