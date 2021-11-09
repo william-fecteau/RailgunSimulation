@@ -9,12 +9,14 @@ let gameField = null; // Element containing the renderer
 let isSimulationRunning = false; // This lets us control if the game loop is gonna call itself
 let frameCounter = 0;
 let waitingForBgLoad = false;
+let currentSpeed = 0;
 
 // Simulation data
 let curSimData = null; // Simulation data calculated by the backend
 let curStep = 0; // Current simulation step reached relative to the fixed time stamp
 let xStep = 0;
 let yStep = 0;
+let speedStep = 0;
 let timeStep = 0;
 let cannonLength = 0;
 let cannonAngle = 0;
@@ -28,6 +30,7 @@ let projectile = null;  // Projectile object
 let cannon = null;
 let background = null;
 let ground = null;
+let textureLoader = new THREE.TextureLoader();
 
 /*
 ======================================
@@ -69,8 +72,8 @@ function initScene() {
 function setBg (urlBgTexture, urlSkybox, callback)
 {
     if (isSimulationRunning) return;
-    new THREE.TextureLoader().load(urlBgTexture, function (bgTexture) {
-        new THREE.TextureLoader().load(urlSkybox, function (skybox) {
+    textureLoader.load(urlBgTexture, function (bgTexture) {
+        textureLoader.load(urlSkybox, function (skybox) {
             let geoBg = new THREE.PlaneGeometry(bgTexture.image.width*100, bgTexture.image.height);
             bgTexture.magFilter = THREE.LinearFilter;
             bgTexture.wrapS = THREE.RepeatWrapping;
@@ -91,9 +94,6 @@ function setBg (urlBgTexture, urlSkybox, callback)
             }
         });
     });
-
-    // Draw only one frame to get the cannon and the ground
-    renderer.render(scene, camera);
 }
 
 function startSimulation() {
@@ -111,7 +111,7 @@ function startSimulation() {
 
     // Creating projectile
     const geometry = new THREE.PlaneGeometry(20 * METER_FACTOR, 20 * METER_FACTOR);
-    new THREE.TextureLoader().load("/Images/monke.png", (monke) => {
+    textureLoader.load("/Images/monke.png", (monke) => {
         const material = new THREE.MeshBasicMaterial( { map: monke, transparent: true} );
         projectile = new THREE.Mesh(geometry, material);
         projectile.position.set(0, 0, 0);
@@ -195,15 +195,20 @@ function update() {
 
         let x = stepData[0];
         let y = stepData[1];
+        
+        currentSpeed = Math.sqrt(stepData[2]**2 + stepData[3]**2);
+
 
         // Linear interpolation between points
         if (nextStepData !== null) {
             xStep = ((nextStepData[0] - x) / FPS) * METER_FACTOR;
             yStep = ((nextStepData[1] - y) / FPS) * METER_FACTOR;
+            speedStep = ((Math.sqrt(nextStepData[2]**2 + nextStepData[3]**2) - currentSpeed) / FPS);
         }
         else {
             xStep = 0;
             yStep = 0;
+            speedStep = 0;
         }
 
 
@@ -221,9 +226,19 @@ function update() {
 
     $("#cur-pos").text("Current position : (" + Math.round(projectile.position.x, 2) + "," + Math.round(projectile.position.y, 2) + ")");
 
+    currentSpeed += speedStep;
     projectile.position.x += xStep;
     projectile.position.y += yStep;
-    if(projectile.position.y > 0) projectile.rotation.z = projectile.rotation.z + 0.1;
+
+    let tag = "Current speed";
+    if(projectile.position.y === 0) tag = "Impact speed";
+    $("#cur-speed").text(`${tag} : ${Math.round(currentSpeed * 18/5 * 100)/100} km/h (${Math.round(currentSpeed * 100)/100} m/s)`);
+
+    if(projectile.position.y > 0) {
+        //console.log("Speed x: " + curSimData[curStep][2] + "Speed y: " + curSimData[curStep][3]);
+        //console.log("Speed overall: " + Math.sqrt(curSimData[curStep][2]**2 + curSimData[curStep][3]**2));
+        projectile.rotation.z = projectile.rotation.z + Math.sqrt(0.0001 * currentSpeed);
+    }
 
     frameCounter++;
 }
@@ -237,11 +252,9 @@ function MoveCamera(x, y) {
 // width : width of the plane
 // height : height of the plane
 function LoadTexture(texture_name, width, height) {
-    // Initialize the loader
-    const loader = new THREE.TextureLoader();
-
+    
     // Load the material
-    const material = new THREE.MeshBasicMaterial({map: loader.load(texture_name)});
+    const material = new THREE.MeshBasicMaterial({map: textureLoader.load(texture_name)});
 
     // Map the texture
     const geometry = new THREE.PlaneGeometry(width, height);
@@ -297,7 +310,7 @@ function monke (params) {
     
         let lastPoint = curSimData[curSimData.length - 1];
         score = lastPoint[0];
-        $("#sim-score").text("This simulation score : " + score + " m");
+        $("#sim-score").text("This simulation score : " + Math.round(score*100)/100 + " m");
 
         cannonLength = parseFloat(params["length"]);
         cannonAngle = parseFloat(params["angle"]);
