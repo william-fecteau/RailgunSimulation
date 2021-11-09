@@ -1,3 +1,6 @@
+/*global $, monke, stopSimulation, rotateCannon, updateCannonLength, setBg, currentMonke, changePlanet*/
+/*jshint sub:true*/
+ /*jshint unused:false*/
 let PARAMS = {
     //          min,    max,    step    default 
     mass      : [1,     100,    1,      20],
@@ -12,7 +15,7 @@ let PARAMS = {
         iron: (9.7 * (10** -8)),
         lead: (22 * (10** -8)),
         silver: (1.59 * (10** -8)),
-        gorilla: 0,
+        monke: 0,
     },
     planet : {
         earth: -9.8,
@@ -28,8 +31,7 @@ let PARAMS = {
         gazoline: (2.92 * (10** -4)),
         meg: (2.14 * (10** -2))
     }
-}
-
+};
 
 function updateTextInput(id , val) {
     document.getElementById(id).value=val;
@@ -55,7 +57,7 @@ function initializeMenu() {
                 for: `${prop}-controler`
             })
         );
-        if(PARAMS[prop].constructor == Object) { 
+        if(PARAMS[prop].constructor === Object) { 
             let select = $('<select>', {
                     class : "range",
                     id: `${prop}-controler`,
@@ -82,8 +84,8 @@ function initializeMenu() {
                 }).on("input", (event) => {
                     updateTextInput(`${prop}-counter`, event.target.value)
 
-                    if (prop == 'angle') rotateCannon(parseFloat($("#angle-counter").val()));
-                    if (prop == 'length') updateCannonLength(parseFloat($("#length-counter").val()));
+                    if (prop === 'angle') rotateCannon(parseFloat($("#angle-counter").val()));
+                    if (prop === 'length') updateCannonLength(parseFloat($("#length-counter").val()));
                 });
             div.append(range);
             div.append( // counter
@@ -100,27 +102,14 @@ function initializeMenu() {
         }
         $('#controlers').append(div);
     }
-};
+}
 
 
 function menu() {
     initializeMenu();
     $("#planet-controler").val(PARAMS.planet.mercury);
-    $("#planet-controler").on("change", (event)=>{
-        let planet = {
-            earth: ["Images/foreground-earth.png", "Images/skybox-earth.png"],
-            mercury: ["Images/foreground-mercury.png", "Images/skybox-mercury.png"],
-            moon: ["Images/foreground-moon.png", "Images/skybox-moon.png"],
-            jupiter: ["Images/foreground-jupiter.png", "Images/skybox-jupiter.png"],
-            sun: ["Images/foreground-sun.png", "Images/skybox-sun.png"],
-            moon: ["Images/foreground-moon.png", "Images/skybox-moon.png"],
-            titan: ["Images/foreground-titan.png", "Images/skybox-titan.png"]
-        }
-        setBg(
-            planet[$("#planet option:selected").text()][0], 
-            planet[$("#planet option:selected").text()][1]
-            );
-    });
+    $("#planet-controler").on("change", () => {changePlanet();});
+    $("#metals-controler").on("change", (event) => {currentMonke = MONKES[$("#metals-controler option:selected").text()];});
 }
 
 $(function() {

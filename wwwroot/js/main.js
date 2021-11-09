@@ -1,16 +1,31 @@
+/*global THREE, $ */
+/*jshint sub:true*/
+/*jshint unused:false*/
+
 const METER_FACTOR = 2;
 const FPS = 10;
 const cameraOffset = new THREE.Vector3(-100, 0, 0);
+const MONKES = {
+    copper:     "/Images/monke-copper.png",
+    iron:       "/Images/monke-iron.png",
+    lead:       "/Images/monke-lead.png",
+    silver:     "/Images/monke-silver.png",
+    monke:      "/Images/monke.png"
+};
 
 let gameField = null; // Element containing the renderer
 let isSimulationRunning = false; // This lets us control if the game loop is gonna call itself
 let frameCounter = 0;
+let waitingForBgLoad = false;
+let currentSpeed = 0;
+let currentMonke = MONKES.monke;
 
 // Simulation data
 let curSimData = null; // Simulation data calculated by the backend
 let curStep = 0; // Current simulation step reached relative to the fixed time stamp
 let xStep = 0;
 let yStep = 0;
+let speedStep = 0;
 let timeStep = 0;
 let cannonLength = 0;
 let cannonAngle = 0;
@@ -23,16 +38,8 @@ let renderer = null;
 let projectile = null;  // Projectile object
 let cannon = null;
 let background = null;
-
-
-function main() {
-    gameField = $("#gamefield");
-    setupGamefield();
-}
-
-$(function() {
-    main();
-});
+let ground = null;
+let textureLoader = new THREE.TextureLoader();
 
 
 /*
@@ -42,7 +49,7 @@ $(function() {
  */
 function setupGamefield() {
     scene = new THREE.Scene();
-    camera = new THREE.OrthographicCamera(-10, gameField.width(), gameField.height(), -10, -1, 1);
+    camera = new THREE.OrthographicCamera(-10, gameField.width(), gameField.height(), -10, -1000, 1000);
 
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(gameField.width(), gameField.height());
@@ -56,51 +63,58 @@ function initScene() {
     const geometryGround = new THREE.PlaneGeometry(1000000000, 5 * METER_FACTOR);
     const materialGround = new THREE.MeshBasicMaterial( { color: "#FFD966" } );
     ground = new THREE.Mesh(geometryGround, materialGround);
-    ground.position.set(0, -10, 0);
+    ground.position.set(0, -10, 10);
     scene.add(ground);   
 
     // Creating cannon with default values
-    const geometryCannon = new THREE.PlaneGeometry(50 * METER_FACTOR, 10);
+    const geometryCannon = new THREE.PlaneGeometry(50 * METER_FACTOR ** 2, 10);
     const materialCannon = new THREE.MeshBasicMaterial( { color: 0x808080 } );
     cannon = new THREE.Mesh(geometryCannon, materialCannon);
-    cannon.renderOrder = 99999;
+    cannon.position.set(0, 0, 10);
     rotateCannon(45);
     scene.add(cannon);
 
     // set bg + render once
     setBg('/Images/foreground-mercury.png', '/Images/skybox-mercury.png',
-            () => {scene.render(scene, camera)}
+            () => {renderer.render(scene, camera);}
         );
 }
 
+// Loads a foreground mesh + background
 function setBg (urlBgTexture, urlSkybox, callback)
 {
     if (isSimulationRunning) return;
-    bgTexture = new THREE.TextureLoader().load(urlBgTexture, function (bgTexture) {
-        skyBox = new THREE.TextureLoader().load(urlSkybox, function (skybox) {
-            let geoBg = new THREE.PlaneGeometry(bgTexture.image.width*100, bgTexture.image.height);
+    textureLoader.load(urlBgTexture, function (bgTexture) {
+        textureLoader.load(urlSkybox, function (skybox) {
+            let geoBg = new THREE.PlaneGeometry(bgTexture.image.width*1000, bgTexture.image.height*2);
             bgTexture.magFilter = THREE.LinearFilter;
             bgTexture.wrapS = THREE.RepeatWrapping;
-            bgTexture.repeat.set(100,1);
+            bgTexture.repeat.set(1000,1);
             const matBg = new THREE.MeshBasicMaterial( { map: bgTexture, transparent: true} );
             scene.remove(background);
             background = new THREE.Mesh(geoBg, matBg);
             background.position.set(-50, bgTexture.image.height /2, 0);
             scene.add(background);
+            background.renderOrder = -9999;
             scene.background = skybox;
             
             // Draw only one frame to get the cannon and the ground
             renderer.render(scene, camera);
-        })
-    });
+            waitingForBgLoad = false;
 
-    // Draw only one frame to get the cannon and the ground
-    renderer.render(scene, camera);
+            if(callback){
+                callback();
+            }
+        });
+    });
 }
 
 function startSimulation() {
     if (isSimulationRunning) return;
-    if (curSimData == null || curSimData.length == 0) return;
+    if(waitingForBgLoad){
+        changePlanet();
+    }
+    if (curSimData === null || curSimData.length === 0) return;
 
     camera.position.set(0, 0, 0);
 
@@ -109,8 +123,8 @@ function startSimulation() {
     //test d'un projectile créé avec une image
 
     // Creating projectile
-    const geometry = new THREE.PlaneGeometry(20 * METER_FACTOR, 20 * METER_FACTOR,);
-    let monkey = new THREE.TextureLoader().load("/Images/monke.png", (monke) => {
+    const geometry = new THREE.PlaneGeometry(20 * METER_FACTOR, 20 * METER_FACTOR);
+    textureLoader.load(currentMonke, (monke) => {
         const material = new THREE.MeshBasicMaterial( { map: monke, transparent: true} );
         projectile = new THREE.Mesh(geometry, material);
         projectile.position.set(0, 0, 0);
@@ -123,9 +137,25 @@ function startSimulation() {
 
 }
 
+function changePlanet() {
+    waitingForBgLoad = true;
+    let planet = {
+        earth: ["Images/foreground-earth.png", "Images/skybox-earth.png"],
+        mercury: ["Images/foreground-mercury.png", "Images/skybox-mercury.png"],
+        moon: ["Images/foreground-moon.png", "Images/skybox-moon.png"],
+        jupiter: ["Images/foreground-jupiter.png", "Images/skybox-jupiter.png"],
+        sun: ["Images/foreground-sun.png", "Images/skybox-sun.png"],
+        titan: ["Images/foreground-titan.png", "Images/skybox-titan.png"]
+    };
+    setBg(
+        planet[$("#planet-controler option:selected").text()][0], 
+        planet[$("#planet-controler option:selected").text()][1]
+        );
+}
+
 
 function stopSimulation() {
-    if (projectile != null) scene.remove(projectile);
+    if (projectile !== null) scene.remove(projectile);
     projectile = null;
     isSimulationRunning = false; // Stop it, get some help
 
@@ -134,6 +164,9 @@ function stopSimulation() {
 
     // Draw only one frame to get the cannon and the ground
     renderer.render(scene, camera);
+    if(waitingForBgLoad){
+        changePlanet();
+    }
 }
 
 function gameLoop() {
@@ -149,13 +182,13 @@ function gameLoop() {
     renderer.render(scene, camera);
 
     requestAnimationFrame(gameLoop);
-};
+}
 
 function update() {
-    if (projectile == null) return;
+    if (projectile === null) return;
 
     // Every second, update position
-    if (frameCounter % FPS == 0) {
+    if (frameCounter % FPS === 0) {
         curStep++;
 
         // If no more data, stop the simulation
@@ -173,15 +206,20 @@ function update() {
 
         let x = stepData[0];
         let y = stepData[1];
+        
+        currentSpeed = Math.sqrt(stepData[2]**2 + stepData[3]**2);
+
 
         // Linear interpolation between points
-        if (nextStepData != null) {
+        if (nextStepData !== null) {
             xStep = ((nextStepData[0] - x) / FPS) * METER_FACTOR;
             yStep = ((nextStepData[1] - y) / FPS) * METER_FACTOR;
+            speedStep = ((Math.sqrt(nextStepData[2]**2 + nextStepData[3]**2) - currentSpeed) / FPS);
         }
         else {
             xStep = 0;
             yStep = 0;
+            speedStep = 0;
         }
 
 
@@ -197,10 +235,22 @@ function update() {
         camera.translateX(xStep);
     }
 
-    $("#cur-pos").text("Current position : (" + Math.round(projectile.position.x, 2) + "," + Math.round(projectile.position.y, 2) + ")");
+    $("#cur-pos").text("Current position : (" + Math.round(projectile.position.x, 2)/METER_FACTOR + "," + 
+    Math.round(projectile.position.y, 2)/METER_FACTOR + ")");
 
+    currentSpeed += speedStep;
     projectile.position.x += xStep;
     projectile.position.y += yStep;
+
+    let tag = "Current speed";
+    if(projectile.position.y === 0) tag = "Impact speed";
+    $("#cur-speed").text(`${tag} : ${Math.round(currentSpeed * 18/5 * 100)/100} km/h (${Math.round(currentSpeed * 100)/100} m/s)`);
+
+    if(projectile.position.y > 0) {
+        //console.log("Speed x: " + curSimData[curStep][2] + "Speed y: " + curSimData[curStep][3]);
+        //console.log("Speed overall: " + Math.sqrt(curSimData[curStep][2]**2 + curSimData[curStep][3]**2));
+        projectile.rotation.z = projectile.rotation.z + Math.sqrt(0.0001 * currentSpeed);
+    }
 
     frameCounter++;
 }
@@ -214,11 +264,9 @@ function MoveCamera(x, y) {
 // width : width of the plane
 // height : height of the plane
 function LoadTexture(texture_name, width, height) {
-    // Initialize the loader
-    const loader = new THREE.TextureLoader();
-
+    
     // Load the material
-    const material = new THREE.MeshBasicMaterial({map: loader.load(texture_name)});
+    const material = new THREE.MeshBasicMaterial({map: textureLoader.load(texture_name)});
 
     // Map the texture
     const geometry = new THREE.PlaneGeometry(width, height);
@@ -229,23 +277,22 @@ function LoadTexture(texture_name, width, height) {
 function rotateCannon(angle) {
     cannonAngle = angle;
     
-    if (!isSimulationRunning) {
-        // Draw only one frame to get the cannon and the ground
-        cannon.rotation.set(0, 0, 2*Math.PI*angle/360);
-        renderer.render(scene, camera);
-    }
+    // Draw only one frame to get the cannon and the ground
+    cannon.rotation.set(0, 0, 2*Math.PI*angle/360);
+    renderer.render(scene, camera);
 }
 
 function updateCannonLength(length) {
-    if (length != 0) {
+    if (length !== 0) {
         scene.remove(cannon);
         cannon = null;
 
         cannonLength = length;
         // Re-creating cannon with good lenght
-        const geometryCannon = new THREE.PlaneGeometry(length * METER_FACTOR, 10);
+        const geometryCannon = new THREE.PlaneGeometry(length * METER_FACTOR ** 2, 10);
         const materialCannon = new THREE.MeshBasicMaterial( { color: 0x808080 } );
         cannon = new THREE.Mesh(geometryCannon, materialCannon);
+        cannon.position.set(0,0,10);
         rotateCannon(cannonAngle);
         scene.add(cannon);
 
@@ -270,11 +317,12 @@ function monke (params) {
         dataType: "json",
     }).done(function(e) {
         curSimData = e["data"];
-        if (curSimData === null || curSimData.length == 0) return; // Add something client side to show that it exploded
+        if (curSimData === null || curSimData.length === 0) return; // Add something client side to show that it exploded
     
-        lastPoint = curSimData[curSimData.length - 1];
+        let lastPoint = curSimData[curSimData.length - 1];
         score = lastPoint[0];
         $("#sim-score").text("This simulation score : " + score.toLocaleString('en-US', {score:0}) + " m");
+        //$("#sim-score").text("This simulation score : " + Math.round(score*100)/100 + " m");
 
         cannonLength = parseFloat(params["length"]);
         cannonAngle = parseFloat(params["angle"]);
@@ -282,7 +330,8 @@ function monke (params) {
     }).fail(function(e) {
         console.log(e);
     });
-};
+}
+
 
 $("#stop-sim").click(function() {
     stopSimulation();
@@ -312,3 +361,12 @@ $(document).keydown(function(event) {
     }
 });
 */
+
+function main() {
+    gameField = $("#gamefield");
+    setupGamefield();
+}
+
+$(function() {
+    main();
+});
