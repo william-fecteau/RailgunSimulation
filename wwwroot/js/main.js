@@ -49,7 +49,7 @@ let textureLoader = new THREE.TextureLoader();
  */
 function setupGamefield() {
     scene = new THREE.Scene();
-    camera = new THREE.OrthographicCamera(-10, gameField.width(), gameField.height(), -10, -1, 1);
+    camera = new THREE.OrthographicCamera(-10, gameField.width(), gameField.height(), -10, -1000, 1000);
 
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(gameField.width(), gameField.height());
@@ -63,13 +63,14 @@ function initScene() {
     const geometryGround = new THREE.PlaneGeometry(1000000000, 5 * METER_FACTOR);
     const materialGround = new THREE.MeshBasicMaterial( { color: "#FFD966" } );
     ground = new THREE.Mesh(geometryGround, materialGround);
-    ground.position.set(0, -10, 0);
+    ground.position.set(0, -10, 10);
     scene.add(ground);   
 
     // Creating cannon with default values
-    const geometryCannon = new THREE.PlaneGeometry(50 * METER_FACTOR, 10);
+    const geometryCannon = new THREE.PlaneGeometry(50 * METER_FACTOR ** 2, 10);
     const materialCannon = new THREE.MeshBasicMaterial( { color: 0x808080 } );
     cannon = new THREE.Mesh(geometryCannon, materialCannon);
+    cannon.position.set(0, 0, 10);
     rotateCannon(45);
     scene.add(cannon);
 
@@ -79,20 +80,22 @@ function initScene() {
         );
 }
 
+// Loads a foreground mesh + background
 function setBg (urlBgTexture, urlSkybox, callback)
 {
     if (isSimulationRunning) return;
     textureLoader.load(urlBgTexture, function (bgTexture) {
         textureLoader.load(urlSkybox, function (skybox) {
-            let geoBg = new THREE.PlaneGeometry(bgTexture.image.width*100, bgTexture.image.height);
+            let geoBg = new THREE.PlaneGeometry(bgTexture.image.width*1000, bgTexture.image.height*2);
             bgTexture.magFilter = THREE.LinearFilter;
             bgTexture.wrapS = THREE.RepeatWrapping;
-            bgTexture.repeat.set(100,1);
+            bgTexture.repeat.set(1000,1);
             const matBg = new THREE.MeshBasicMaterial( { map: bgTexture, transparent: true} );
             scene.remove(background);
             background = new THREE.Mesh(geoBg, matBg);
             background.position.set(-50, bgTexture.image.height /2, 0);
             scene.add(background);
+            background.renderOrder = -9999;
             scene.background = skybox;
             
             // Draw only one frame to get the cannon and the ground
@@ -273,11 +276,9 @@ function LoadTexture(texture_name, width, height) {
 function rotateCannon(angle) {
     cannonAngle = angle;
     
-    if (!isSimulationRunning) {
-        // Draw only one frame to get the cannon and the ground
-        cannon.rotation.set(0, 0, 2*Math.PI*angle/360);
-        renderer.render(scene, camera);
-    }
+    // Draw only one frame to get the cannon and the ground
+    cannon.rotation.set(0, 0, 2*Math.PI*angle/360);
+    renderer.render(scene, camera);
 }
 
 function updateCannonLength(length) {
@@ -287,9 +288,10 @@ function updateCannonLength(length) {
 
         cannonLength = length;
         // Re-creating cannon with good lenght
-        const geometryCannon = new THREE.PlaneGeometry(length * METER_FACTOR, 10);
+        const geometryCannon = new THREE.PlaneGeometry(length * METER_FACTOR ** 2, 10);
         const materialCannon = new THREE.MeshBasicMaterial( { color: 0x808080 } );
         cannon = new THREE.Mesh(geometryCannon, materialCannon);
+        cannon.position.set(0,0,10);
         rotateCannon(cannonAngle);
         scene.add(cannon);
 

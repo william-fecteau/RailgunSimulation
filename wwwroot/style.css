@@ -82,7 +82,7 @@ body, html {
 	padding-top: 1rem;
     flex: 0 1;
     color: var(--footer-h2);
-    padding: 1.5%;
+    padding: 10px;
     text-align: center;
 }
 
