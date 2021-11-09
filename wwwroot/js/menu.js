@@ -1,4 +1,4 @@
-/*global $, monke, stopSimulation, rotateCannon, updateCannonLength, setBg*/
+/*global $, monke, stopSimulation, rotateCannon, updateCannonLength, setBg, currentMonke, changePlanet*/
 /*jshint sub:true*/
  /*jshint unused:false*/
 let PARAMS = {
@@ -15,7 +15,7 @@ let PARAMS = {
         iron: (9.7 * (10** -8)),
         lead: (22 * (10** -8)),
         silver: (1.59 * (10** -8)),
-        gorilla: 0,
+        monke: 0,
     },
     planet : {
         earth: -9.8,
@@ -32,7 +32,6 @@ let PARAMS = {
         meg: (2.14 * (10** -2))
     }
 };
-
 
 function updateTextInput(id , val) {
     document.getElementById(id).value=val;
@@ -110,6 +109,7 @@ function menu() {
     initializeMenu();
     $("#planet-controler").val(PARAMS.planet.mercury);
     $("#planet-controler").on("change", () => {changePlanet();});
+    $("#metals-controler").on("change", (event) => {currentMonke = MONKES[$("#metals-controler option:selected").text()];});
 }
 
 $(function() {

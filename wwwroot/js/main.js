@@ -1,15 +1,24 @@
 /*global THREE, $ */
 /*jshint sub:true*/
 /*jshint unused:false*/
+
 const METER_FACTOR = 2;
 const FPS = 10;
 const cameraOffset = new THREE.Vector3(-100, 0, 0);
+const MONKES = {
+    copper:     "/Images/monke-copper.png",
+    iron:       "/Images/monke-iron.png",
+    lead:       "/Images/monke-lead.png",
+    silver:     "/Images/monke-silver.png",
+    monke:      "/Images/monke.png"
+};
 
 let gameField = null; // Element containing the renderer
 let isSimulationRunning = false; // This lets us control if the game loop is gonna call itself
 let frameCounter = 0;
 let waitingForBgLoad = false;
 let currentSpeed = 0;
+let currentMonke = MONKES.monke;
 
 // Simulation data
 let curSimData = null; // Simulation data calculated by the backend
@@ -31,6 +40,7 @@ let cannon = null;
 let background = null;
 let ground = null;
 let textureLoader = new THREE.TextureLoader();
+
 
 /*
 ======================================
@@ -111,7 +121,7 @@ function startSimulation() {
 
     // Creating projectile
     const geometry = new THREE.PlaneGeometry(20 * METER_FACTOR, 20 * METER_FACTOR);
-    textureLoader.load("/Images/monke.png", (monke) => {
+    textureLoader.load(currentMonke, (monke) => {
         const material = new THREE.MeshBasicMaterial( { map: monke, transparent: true} );
         projectile = new THREE.Mesh(geometry, material);
         projectile.position.set(0, 0, 0);
@@ -125,9 +135,7 @@ function startSimulation() {
 }
 
 function changePlanet() {
-    if (isSimulationRunning) {
-        waitingForBgLoad = true;
-    }
+    waitingForBgLoad = true;
     let planet = {
         earth: ["Images/foreground-earth.png", "Images/skybox-earth.png"],
         mercury: ["Images/foreground-mercury.png", "Images/skybox-mercury.png"],
@@ -137,8 +145,8 @@ function changePlanet() {
         titan: ["Images/foreground-titan.png", "Images/skybox-titan.png"]
     };
     setBg(
-        planet[$("#planet option:selected").text()][0], 
-        planet[$("#planet option:selected").text()][1]
+        planet[$("#planet-controler option:selected").text()][0], 
+        planet[$("#planet-controler option:selected").text()][1]
         );
 }
 
@@ -319,6 +327,7 @@ function monke (params) {
         console.log(e);
     });
 }
+
 
 $("#stop-sim").click(function() {
     stopSimulation();
