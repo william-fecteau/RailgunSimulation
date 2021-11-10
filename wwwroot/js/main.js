@@ -22,7 +22,7 @@ let currentMonke = MONKES.monke;
 
 // Simulation data
 let curSimData = null; // Simulation data calculated by the backend
-let curStep = 0; // Current simulation step reached relative to the fixed time stamp
+let curStep = -1; // Current simulation step reached relative to the fixed time stamp
 let xStep = 0;
 let yStep = 0;
 let speedStep = 0;
@@ -40,6 +40,7 @@ let cannon = null;
 let background = null;
 let ground = null;
 let textureLoader = new THREE.TextureLoader();
+let trajectory = [];
 
 
 /*
@@ -129,7 +130,7 @@ function startSimulation() {
         projectile = new THREE.Mesh(geometry, material);
         projectile.position.set(0, 0, 0);
         scene.add(projectile);
-        curStep = 0;
+        curStep = -1;
         frameCounter = 0;
         isSimulationRunning = true;
         gameLoop(); // Start it (Its gonna call itself internally)
@@ -158,6 +159,8 @@ function stopSimulation() {
     if (projectile !== null) scene.remove(projectile);
     projectile = null;
     isSimulationRunning = false; // Stop it, get some help
+
+    MoveCamera(0,0);
 
     updateCannonLength(cannonLength);
     rotateCannon(cannonAngle);
@@ -318,11 +321,34 @@ function monke (params) {
     }).done(function(e) {
         curSimData = e["data"];
         if (curSimData === null || curSimData.length === 0) return; // Add something client side to show that it exploded
-    
+        
+        // Add extra starting points to simulate monke going through cannon (based off distance of first 2 points)
+        while(curSimData[0][0] > 0 && curSimData[0][1] > 0) 
+        {
+            curSimData.unshift([
+                (curSimData[0][0] * 2 - curSimData[1][0]), // x
+                (curSimData[0][1] * 2 - curSimData[1][1]), // y
+                (curSimData[0][2] * 2 - curSimData[1][2]), // x m/s
+                (curSimData[0][3] * 2 - curSimData[1][3])  // y m/s
+            ]);   
+        }
+
         let lastPoint = curSimData[curSimData.length - 1];
         score = lastPoint[0];
         $("#sim-score").text("This simulation score : " + score.toLocaleString('en-US', {score:0}) + " m");
         //$("#sim-score").text("This simulation score : " + Math.round(score*100)/100 + " m");
+
+        trajectory.forEach(point => {
+            scene.remove(point);
+        });
+        
+        curSimData.forEach(point => {
+            let geometry = new THREE.CircleGeometry( 2, 10 );
+            let material = new THREE.MeshBasicMaterial( { color: "red" } );
+            trajectory.push(new THREE.Mesh( geometry, material ));
+            trajectory.at(-1).position.set(point[0]*METER_FACTOR, point[1]*METER_FACTOR, 99);
+            scene.add( trajectory.at(-1) );
+        });
 
         cannonLength = parseFloat(params["length"]);
         cannonAngle = parseFloat(params["angle"]);

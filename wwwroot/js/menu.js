@@ -42,7 +42,7 @@ function handleSubmit()
     stopSimulation();
 
     let params = {};
-    const formData = new FormData(document.querySelector('form'))
+    const formData = new FormData(document.querySelector('form'));
     for (var pair of formData.entries()) {
         params[pair[0]] = pair[1];
     }
